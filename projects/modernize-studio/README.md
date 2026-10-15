@@ -28,7 +28,7 @@ Open `http://localhost:8000/projects/modernize-studio/` in a browser. Run determ
 node --test projects/modernize-studio/engine.test.mjs
 ```
 
-Observed locally on 15 October 2026: **5 tests passed, 0 failed**. Cases cover all three supported examples, unsupported dialect/input, quotes and comments, equivalent fixture rows, and a deliberate mismatch.
+Observed locally on 14 October 2026: **5 tests passed, 0 failed**. Cases cover all three supported examples, unsupported dialect/input, quotes and comments, equivalent fixture rows, and a deliberate mismatch.
 
 ## Limits and risks
 
