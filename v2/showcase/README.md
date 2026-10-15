@@ -2,7 +2,7 @@
 
 This is a GitHub Pages-compatible **frozen export**, not a hosted API. The three local applications execute and persist synthetic data independently. `export.py` reads their resulting SQLite database, governed SQL export, and per-case migration reports; `evidence.json` is the reviewed public snapshot. The page fetches that file and draws charts/tables from its records. It never claims a live connection or production telemetry.
 
-The committed evidence records the source implementation commit in `source_commit`. Its export time is informational, not a freshness guarantee. Re-exporting requires all three local systems to have run successfully. The exporter rejects a missing EnergyPulse database, a non-synthetic source manifest, an analytics export without the synthetic label, and incomplete/duplicated migration case reports.
+The committed evidence records the source implementation commit in `source_commit`. Its export time is informational, not a freshness guarantee. Re-exporting requires all three local systems to have run successfully. The exporter checks the EnergyPulse JSONL hash against its synthetic manifest and persisted successful ingestion, and rejects a missing/mismatched database, an analytics export without the synthetic label, or incomplete, duplicated, or unexpected migration decisions.
 
 ## Reproduce
 

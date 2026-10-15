@@ -27,14 +27,16 @@ Each package has contracts, architecture diagram, data dictionary, ADR/runbook, 
 - Remote [GitHub Actions run 38751666431](https://github.com/MariaCM34/MariaCM34.github.io/actions/runs/38751666431) **completed successfully** at `aac6680`, repeating V1/V2 tests, coverage gates, and the three live browser flows.
 - Filename-only secret-pattern scan of V2 source and workflow found no matches. Generated databases, Parquet, reports, dependencies, and coverage are Git-ignored. Public evidence must still be reviewed before any Pages promotion.
 
-## Static showcase in progress
+## Static showcase and publication boundary
 
-`v2/showcase/` exports a small curated `evidence.json` from the three executed local systems and renders it with a responsive bilingual static page. It labels the export frozen/synthetic and distinguishes it from the runnable local APIs. A local Playwright flow passed on 1280×800 and 390×844, exercising the sensor gap, governed metric/currency selection, a failed typed diff, keyboard language switching, and missing-export state. The showcase is **uncommitted and not yet in remote CI** at the time of this entry.
+`v2/showcase/` exports a small curated `evidence.json` from the three executed local systems and renders it with a responsive bilingual static page. It labels the export frozen/synthetic and distinguishes it from the runnable local APIs. A local Playwright flow passed on 1280×800 and 390×844, exercising the sensor gap, governed metric/currency selection, a failed typed diff, keyboard language switching, and missing-export state. The committed snapshot has 106 Bronze rows, 12,723 governed source rows, and 17 executed migration decisions. A repeat export matched the committed payload exactly after excluding only its source-commit and export-time metadata. A content scan found no local absolute paths or credential markers in `evidence.json`.
+
+Commit `a72b337356682f18728b54f69c5c4f2833e608aa` added the showcase and expanded CI to regenerate it. [GitHub Actions run 38753659110](https://github.com/MariaCM34/MariaCM34.github.io/actions/runs/38753659110) **completed successfully**, including the three application browser flows and the static showcase browser flow. Subsequent exporter hardening checks the EnergyPulse source hash against the manifest and successful ingestion, plus exact reviewed migration case IDs/statuses; that follow-up must pass CI before it is treated as verified.
 
 ## Next actions
 
-1. Review the static export for accidental local paths, secrets, and misleading claims; complete its runbook.
-2. Commit only curated showcase/workflow/status files, push `portfolio-v2`, and require the expanded CI to pass including regeneration and browser test of the static export.
-3. Keep `main` and public Pages unchanged until V2 has an explicit release decision. Recheck remote refs and report the precise verified URLs and SHA.
+1. Commit exporter provenance hardening and this status update; push only `portfolio-v2` and require CI to pass for that change.
+2. Recheck remote `main` and development branch refs. Keep public Pages unchanged until V2 has an explicit release decision.
+3. Continue product QA and acceptance review from the three runbooks; do not present the frozen page as a live hosted application.
 
 Gate 0/1 audit and architecture decisions are in [`docs/06_ARCHITECTURE_GATE_1.md`](docs/06_ARCHITECTURE_GATE_1.md). Reproduction starts at [`../v2/README.md`](../v2/README.md).

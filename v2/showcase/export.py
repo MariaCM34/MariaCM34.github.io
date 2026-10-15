@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sqlite3
 import subprocess
@@ -15,6 +16,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "v2" / "energy_pulse" / "src"))
 from energy_pulse.contracts import RULES  # noqa: E402 — read the versioned executable rule registry
+sys.path.insert(0, str(ROOT / "v2" / "migration_assurance" / "src"))
+from migration_assurance.suite import CASES  # noqa: E402 — check the reviewed case registry
 
 
 def energy_snapshot(database: Path) -> dict:
@@ -46,6 +49,14 @@ def energy_snapshot(database: Path) -> dict:
         manifest = json.loads(database.with_name("events.manifest.json").read_text(encoding="utf-8"))
         if not manifest.get("synthetic"):
             raise ValueError("EnergyPulse source must be marked synthetic")
+        source = database.with_name("events.jsonl")
+        if hashlib.sha256(source.read_bytes()).hexdigest() != manifest["sha256"]:
+            raise ValueError("EnergyPulse source hash does not match its manifest")
+        recorded = conn.execute("""SELECT COUNT(*) FROM pipeline_runs
+            WHERE stage='INGEST' AND status='SUCCESS' AND source_sha256=?""",
+            (manifest["sha256"],)).fetchone()[0]
+        if not recorded or counts["raw_events"] != manifest["emitted_events"]:
+            raise ValueError("EnergyPulse database does not match its executed source")
         return {"schema_version": schema, "source_sha256": manifest["sha256"], "rules": RULES,
                 "expected_events": manifest["expected_events"], "emitted_events": manifest["emitted_events"],
                 "counts": counts, "readings": readings, "quality": quality, "incidents": incidents}
@@ -66,8 +77,11 @@ def analytics_snapshot(path: Path) -> dict:
 
 def migration_snapshot(directory: Path) -> dict:
     reports = [json.loads(path.read_text(encoding="utf-8")) for path in directory.glob("*-report.json")]
-    if len(reports) != 17 or len({r["case_id"] for r in reports}) != 17:
-        raise ValueError("Migration export requires one report for each of 17 reviewed cases")
+    expected = {case["case_id"]: case["expected_status"] for case in CASES}
+    if len(reports) != len(expected) or {r["case_id"] for r in reports} != set(expected):
+        raise ValueError("Migration export requires one report for each reviewed case")
+    if any(report["status"] != expected[report["case_id"]] for report in reports):
+        raise ValueError("Migration report decision differs from the reviewed expectation")
     reports.sort(key=lambda r: r["case_id"])
     counts = dict(Counter(r["status"] for r in reports))
     cases = [{key: report.get(key) for key in ("case_id", "status", "stage", "source_sql", "target_sql",
