@@ -10,7 +10,7 @@ const output = path.dirname(fileURLToPath(import.meta.url));
 const browser = await chromium.launch({headless: true,
   ...(process.env.CHROME_PATH ? {executablePath: process.env.CHROME_PATH} : {})});
 const captures = [
-  ['energy', 'http://127.0.0.1:8876/', async (page, mobile) => {
+  ['energy', process.env.ENERGY_URL || 'http://127.0.0.1:8876/', async (page, mobile) => {
     await page.getByText('Loaded from SQLite through the API.').waitFor();
     if (mobile) {
       await page.locator('#asset').selectOption('CHILL-C301');
@@ -21,18 +21,18 @@ const captures = [
       await page.locator('#lineage').getByText('value: 84.3 C').waitFor();
     }
   }],
-  ['analytics', 'http://127.0.0.1:8766/', async page => {
+  ['analytics', process.env.ANALYTICS_URL || 'http://127.0.0.1:8766/', async page => {
     await page.getByText(/accepted source rows/).waitFor();
     await page.locator('#run').click();
     await page.locator('#result:not([hidden])').waitFor();
   }],
-  ['migration', 'http://127.0.0.1:8767/', async page => {
+  ['migration', process.env.MIGRATION_URL || 'http://127.0.0.1:8767/', async page => {
     await page.getByText('17 of 17 cases').waitFor();
     await page.locator('#status').selectOption('FAIL');
     await page.locator('.case:visible').first().getByRole('link').click();
     await page.getByText(/A-001\.amount: expected 10\.00; actual 11\.00/).waitFor();
   }],
-  ['showcase', 'http://127.0.0.1:8768/', async page => {
+  ['showcase', process.env.SHOWCASE_URL || 'http://127.0.0.1:8768/', async page => {
     await page.getByText('Frozen evidence loaded from executed local runs.').waitFor();
   }],
 ];

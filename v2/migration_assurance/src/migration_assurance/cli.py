@@ -23,7 +23,7 @@ def run_suite(output: Path) -> list[dict]:
     reports = []
     for case in CASES:
         path = cases_dir / f"{case['case_id']}.json"
-        path.write_text(json.dumps(case, indent=2), encoding="utf-8")
+        path.write_text(json.dumps(case, indent=2), encoding="utf-8", newline="\n")
         report = assess(path, output)
         render_report(report, output / f"{report['run_id']}-report.html")
         reports.append(report)

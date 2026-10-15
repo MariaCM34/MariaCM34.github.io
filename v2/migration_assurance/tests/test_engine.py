@@ -32,6 +32,7 @@ def write_case(tmp_path, spec, target="base.json", mutate=None):
 def test_full_executed_suite_has_eleven_distinct_supported_queries(tmp_path):
     reports = run_suite(tmp_path)
     assert len(reports) == 17
+    assert all(b"\r" not in path.read_bytes() for path in (tmp_path / "cases").glob("*.json"))
     assert [r["status"] for r in reports] == [c["expected_status"] for c in CASES]
     supported = reports[:11]
     assert len({r["source_sql"] for r in supported}) == 11
