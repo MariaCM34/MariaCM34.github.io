@@ -1,0 +1,9 @@
+# Local review and customer cutover prerequisites
+
+1. Install pinned dependencies and run the suite using the README commands. Preserve the output directory, case JSON, both fixture files, executed rows, and reports together.
+2. Open the static viewer through a local HTTP server. Filter FAIL and REVIEW; inspect exact source/target SQL, actual engine versions, hash changes, row-level diff and both executed result files. Do not approve a migration using only row counts or a green syntax translation.
+3. To retry, run into a new output directory or rerun into the same directory; report file names contain distinct run IDs. Confirm input hashes before comparing different attempts. The decision for identical inputs should remain stable, while run timestamp/ID changes.
+4. For a real migration, first inventory schema, keys, NULL/type/collation/timezone semantics, deterministic ordering, UDFs and stored procedures. Generate representative approved non-sensitive fixtures. Run both **actual customer source and target engines** in a separately secured environment. Broaden cases, tolerance policies, performance tests, security controls, and DBA review before cutover.
+5. Rollback plan for a real system must preserve source read access, pre-cutover snapshots, cutover checkpoint, reconciliation reports, restore rehearsal, owner/on-call contacts, and explicit go/no-go thresholds. This demo performs no customer cutover and has no rollback automation to pretend otherwise.
+
+If a case becomes REVIEW, correct unsupported SQL or contract errors only after architecture review; do not alter expected status to turn an error green. If a case becomes FAIL, inspect input hashes and row-level differences, then correct fixtures or SQL with a new ruleset/case version. Never erase failed evidence from an audit package.

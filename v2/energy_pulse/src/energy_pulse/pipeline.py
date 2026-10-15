@@ -7,6 +7,7 @@ import json
 import logging
 import sqlite3
 import uuid
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -23,18 +24,32 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def connect(db_path: Path) -> sqlite3.Connection:
+@contextmanager
+def connect(db_path: Path):
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys=ON")
     conn.execute("PRAGMA busy_timeout=5000")
-    return conn
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def migrate(db_path: Path) -> None:
     with connect(db_path) as conn:
         conn.executescript((ROOT / "migrations" / "001_init.sql").read_text(encoding="utf-8"))
+        version = conn.execute("SELECT MAX(version) FROM schema_migrations").fetchone()[0]
+        if version < 2:
+            conn.executescript((ROOT / "migrations" / "002_incident_recovery.sql").read_text(encoding="utf-8"))
+        version = conn.execute("SELECT MAX(version) FROM schema_migrations").fetchone()[0]
+        if version < 3:
+            conn.executescript((ROOT / "migrations" / "003_global_slot_key.sql").read_text(encoding="utf-8"))
 
 
 def _start_run(conn: sqlite3.Connection, stage: str, source_sha: str | None = None) -> str:
@@ -62,7 +77,9 @@ def _reason(exc: Exception) -> str:
     for token, code in [
         ("metric_unit_mismatch", "UNIT_MISMATCH"),
         ("unknown_asset", "UNKNOWN_ASSET"),
+        ("asset_site_mismatch", "SITE_MISMATCH"),
         ("value_not_finite", "NONFINITE_VALUE"),
+        ("nonfinite_json", "NONFINITE_VALUE"),
         ("observed_at_must_be_utc", "NON_UTC_TIME"),
         ("observed_at_off_cadence", "OFF_CADENCE"),
     ]:
@@ -152,41 +169,44 @@ def _incident_rows(conn: sqlite3.Connection, run_id: str) -> int:
             ).fetchall()
             episode = None
 
-            def save(current: dict, closed_at: str | None) -> None:
+            def save(current: dict, closed_at: str | None, recovery_event_id: str | None) -> None:
                 nonlocal count
                 rule = RULES[metric]
                 incident_id = "INC-" + hashlib.sha256(
                     f"{asset_id}|{metric}|{rule['version']}|{current['opened']}".encode()
                 ).hexdigest()[:16].upper()
                 conn.execute(
-                    """INSERT INTO incidents VALUES(?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    """INSERT INTO incidents(incident_id,asset_id,metric,opened_at_utc,closed_at_utc,
+                       status,rule_version,threshold,operator,first_event_id,last_event_id,build_run_id,gap_count)
+                       VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                     (incident_id, asset_id, metric, current["opened"], closed_at,
                      "CLOSED" if closed_at else "OPEN", rule["version"], rule["threshold"],
-                     rule["operator"], current["first_event"], current["last_event"], run_id),
+                     rule["operator"], current["first_event"], current["last_event"], run_id,
+                     current["gap_count"]),
                 )
                 conn.execute("INSERT INTO incident_transitions VALUES(?,?,?,?,?)",
                              (incident_id, "OPEN", current["opened"], current["first_event"], rule["version"]))
                 if closed_at:
                     conn.execute("INSERT INTO incident_transitions VALUES(?,?,?,?,?)",
-                                 (incident_id, "CLOSED", closed_at, current["last_event"], rule["version"]))
+                                 (incident_id, "CLOSED", closed_at, recovery_event_id, rule["version"]))
                 count += 1
 
             for row in rows:
                 observed = datetime.fromisoformat(row["observed_at_utc"].replace("Z", "+00:00"))
                 breach = is_breach(metric, row["value"])
                 if episode and observed - episode["last_time"] != step:
-                    save(episode, (episode["last_time"] + step).isoformat().replace("+00:00", "Z"))
-                    episode = None
+                    # A missing slot is unknown state, never evidence of recovery.
+                    episode["gap_count"] += int((observed - episode["last_time"]) / step) - 1
                 if breach:
                     if episode is None:
-                        episode = {"opened": row["observed_at_utc"], "first_event": row["event_id"]}
+                        episode = {"opened": row["observed_at_utc"], "first_event": row["event_id"], "gap_count": 0}
                     episode["last_event"] = row["event_id"]
                     episode["last_time"] = observed
                 elif episode:
-                    save(episode, row["observed_at_utc"])
+                    save(episode, row["observed_at_utc"], row["event_id"])
                     episode = None
             if episode:
-                save(episode, None)
+                save(episode, None, None)
     return count
 
 
@@ -215,7 +235,14 @@ def build(db_path: Path, *, start: datetime, slots: int) -> dict:
             rows = conn.execute("SELECT * FROM raw_events WHERE processed=0 ORDER BY observed_at_utc,event_id").fetchall()
             for row in rows:
                 event = TelemetryEvent.model_validate_json(row["payload_json"])
-                if watermark and event.observed_at_utc < watermark:
+                expected = conn.execute(
+                    "SELECT 1 FROM expected_slots WHERE asset_id=? AND metric=? AND observed_at_utc=?",
+                    (event.asset_id, event.metric, row["observed_at_utc"]),
+                ).fetchone()
+                if not expected:
+                    _quarantine(conn, row["ingest_run_id"], row["payload_json"], event.event_id, "OUTSIDE_CALENDAR")
+                    late_review += 1
+                elif watermark and event.observed_at_utc < watermark:
                     _quarantine(conn, row["ingest_run_id"], row["payload_json"], event.event_id, "LATE_REVIEW")
                     late_review += 1
                 else:
@@ -245,4 +272,52 @@ def build(db_path: Path, *, start: datetime, slots: int) -> dict:
     result = {"run_id": run_id, "normalized": normalized, "late_review": late_review,
               "affected_hours": affected_count, "incidents": incident_count}
     LOG.info(json.dumps({"stage": "build", **result}))
+    return result
+
+
+def backfill(db_path: Path, *, event_id: str, reason: str) -> dict:
+    """Explicitly approve one quarantined late event and rebuild its affected output."""
+    if not event_id or not reason.strip() or len(reason) > 500:
+        raise ValueError("event_id_and_review_reason_required")
+    migrate(db_path)
+    with connect(db_path) as conn:
+        row = conn.execute(
+            """SELECT r.* FROM raw_events r JOIN quarantine q ON q.event_id=r.event_id
+               WHERE r.event_id=? AND q.reason_code IN ('LATE_REVIEW','OUTSIDE_CALENDAR')
+               ORDER BY q.quarantine_id DESC LIMIT 1""",
+            (event_id,),
+        ).fetchone()
+        if row is None:
+            raise ValueError("event_not_in_late_review")
+        if conn.execute("SELECT 1 FROM measurements WHERE event_id=?", (event_id,)).fetchone():
+            raise ValueError("event_already_normalized")
+        event = TelemetryEvent.model_validate_json(row["payload_json"])
+        if not conn.execute("SELECT 1 FROM expected_slots WHERE asset_id=? AND metric=? AND observed_at_utc=?",
+                            (event.asset_id, event.metric, row["observed_at_utc"])).fetchone():
+            raise ValueError("event_outside_expected_calendar")
+        run_id = _start_run(conn, "BUILD")
+        hour = row["observed_at_utc"][:13] + ":00:00Z"
+        try:
+            conn.execute("BEGIN")
+            conn.execute(
+                """INSERT INTO measurements VALUES(?,?,?,?,?,?,?,?,?)""",
+                (event.event_id, event.asset_id, event.site_id, row["observed_at_utc"],
+                 event.metric, event.value, event.unit, event.quality, run_id),
+            )
+            conn.execute("INSERT INTO reviewed_backfills VALUES(?,?,?,?)", (event_id, reason.strip(), utc_now(), run_id))
+            conn.execute("DELETE FROM asset_hourly WHERE hour_utc=?", (hour,))
+            conn.execute("CREATE TEMP TABLE affected_hours(hour_utc TEXT PRIMARY KEY)")
+            conn.execute("INSERT INTO affected_hours VALUES(?)", (hour,))
+            conn.execute((ROOT / "sql" / "rebuild_gold.sql").read_text(encoding="utf-8"), {"run_id": run_id})
+            incident_count = _incident_rows(conn, run_id)
+            conn.commit()
+            _finish_run(conn, run_id, "SUCCESS", accepted=1,
+                        output_count=conn.execute("SELECT COUNT(*) FROM asset_hourly").fetchone()[0])
+        except Exception as exc:
+            conn.rollback()
+            _finish_run(conn, run_id, "FAILED", error=type(exc).__name__)
+            raise
+    result = {"run_id": run_id, "event_id": event_id, "recomputed_hour": hour,
+              "incidents": incident_count, "review_reason": reason.strip()}
+    LOG.info(json.dumps({"stage": "backfill", **result}))
     return result

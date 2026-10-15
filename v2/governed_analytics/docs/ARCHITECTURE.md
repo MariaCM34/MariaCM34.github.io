@@ -1,0 +1,18 @@
+# Architecture and decisions
+
+This is a single-laptop, zero-secret analytics reference for an ecommerce buyer who needs governed definitions more than a natural-language agent. The executable path is `analytics.pipeline.generate` → contract checks and `raw_*` DuckDB Bronze tables → `models/build.sql` facts/dimension → Parquet extracts → `analytics.semantic.compile_query` → read-only DuckDB execution in `analytics.api` → local browser chart/table or `analytics.export` evidence JSON. `DATA_DICTIONARY.md` states every grain and key.
+
+The generator and loader are separate commands. `seed` creates deterministic JSONL; `build` validates every row and rebuilds the warehouse in a temporary database, replacing the prior snapshot only on success. Duplicate business keys and invalid/FK rows enter the rejection log, never the fact tables. A run ID hashes source files, model SQL, loader code, DuckDB version, model version and rejection content. Parquet files are published into a write-once `parquet/<run_id>/` generation **before** the database file swaps; the warehouse `run_manifest` points at its matching generation. Existing generations are checked for all four files and row counts before reuse. A failed swap leaves an unreferenced Parquet generation while the old warehouse and its Parquet remain consistent. Repeating the same build yields the same content-derived run ID and counts. This is a rebuild-oriented local implementation, not CDC: incremental loading would require source event versions, watermark semantics, and immutable ingestion logs that the synthetic case does not justify yet.
+
+DuckDB was chosen for compact, fast local analytical queries and direct Parquet interchange. Offline build plus read-only API avoids claiming multi-writer service behavior. SQLite is used only for the independently writable audit log. Four reviewed SQL templates are simpler and safer than dynamic SQL parsing or an LLM here. The API's catalog, rows, exact executed SQL, parameters, version, snapshot hash and query ID make the result inspectable. The UI has working metric/currency/date/category controls, a row-derived chart, a table and failure/no-data states. Static Pages can present `analytics.export` output labeled as an executed snapshot; it cannot serve the Python API.
+
+| Component | Operational choice | Why / trade-off |
+|---|---|---|
+| JSONL source and schema checks | Plain Python, stable IDs, integer money | Transparent fixtures and independent oracle; no external feed or format registry. |
+| DuckDB Bronze/facts | One local file, SQL model, bulk CSV staging | Fast local OLAP; no concurrent writes or online refresh. |
+| Parquet derivatives | Four model exports after build | Interoperable inspection; DB file remains the serving snapshot. |
+| Semantic planner | Four metric enums, typed filters, bound values | Auditability and safety; narrower than open-ended analyst exploration. |
+| FastAPI + small browser UI | Localhost with source-backed bars/table | End-to-end interaction without a JS build service; no auth or public hosting. |
+| SQLite audit | Separate file | Refusals logged without mutating read-only snapshot; local-only trust boundary. |
+
+Expected operating cost for the baseline is **$0 incremental paid service spend**, given an existing laptop and locally installed open-source dependencies. This excludes electricity, developer time, disk, network, CI quotas and future hosted backend costs. At the observed default seed, a full build took 1.03 seconds on one Windows host; that is a measurement of this fixture, not a scalability or production latency claim. A production deployment would need auth, tenant isolation, durable orchestration, backups, monitoring, privacy assessment and a service/cost model.

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import sqlite3
+import re
 from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterator
 
@@ -14,6 +16,18 @@ from .contracts import ASSETS, RULES, UNITS
 
 
 WEB = Path(__file__).resolve().parents[2] / "web"
+UTC_FILTER = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+
+
+def validate_filter(value: str | None) -> datetime | None:
+    if value is None:
+        return None
+    if not UTC_FILTER.fullmatch(value):
+        raise HTTPException(status_code=422, detail="timestamp_must_be_utc_second_precision")
+    try:
+        return datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail="invalid_timestamp") from exc
 
 
 @contextmanager
@@ -78,7 +92,8 @@ def create_app(db_path: Path) -> FastAPI:
     ) -> dict:
         if asset_id not in ASSETS or metric not in UNITS:
             raise HTTPException(status_code=422, detail="unsupported_asset_or_metric")
-        if start and end and start > end:
+        start_time, end_time = validate_filter(start), validate_filter(end)
+        if start_time and end_time and (start_time >= end_time or end_time - start_time > timedelta(days=31)):
             raise HTTPException(status_code=422, detail="invalid_time_range")
         with read_db(db_path) as conn:
             items = rows(conn, """SELECT event_id,asset_id,site_id,observed_at_utc,metric,value,unit,source_quality

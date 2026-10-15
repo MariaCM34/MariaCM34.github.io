@@ -1,0 +1,60 @@
+name: Portfolio V2 validation
+on:
+  push:
+    branches: [portfolio-v2]
+  pull_request:
+    branches: [main]
+
+jobs:
+  executable-reference:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONPATH: v2/energy_pulse/src:v2/governed_analytics:v2/migration_assurance/src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned free dependencies
+        run: python -m pip install -r v2/requirements.lock
+      - name: Run V1 regression suite
+        run: node --test
+      - name: Run V2 Python integration and negative tests
+        run: |
+          python -m pytest v2/energy_pulse/tests v2/governed_analytics/tests v2/migration_assurance/tests -q \
+            --cov=energy_pulse.pipeline --cov=energy_pulse.contracts \
+            --cov=analytics.pipeline --cov=analytics.semantic --cov=migration_assurance.engine \
+            --cov-report=term-missing --cov-report=json:v2/coverage.json
+          python v2/check_coverage.py
+      - name: Check EnergyPulse browser JavaScript
+        run: node --check v2/energy_pulse/web/app.js
+      - name: Install pinned browser runner
+        working-directory: v2
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Run three real browser flows against executed local systems
+        run: |
+          python -m energy_pulse.cli demo --out-dir v2/energy_pulse/data/generated/ci --slots 12
+          python -m energy_pulse.cli serve --db v2/energy_pulse/data/generated/ci/energy.sqlite --port 8876 &
+          energy_pid=$!
+          python -m analytics.pipeline all
+          python -m uvicorn analytics.api:app --host 127.0.0.1 --port 8766 &
+          analytics_pid=$!
+          python -m migration_assurance.cli suite --out v2/migration_assurance/artifacts/ci
+          python -m http.server 8767 --bind 127.0.0.1 --directory v2/migration_assurance/artifacts/ci &
+          migration_pid=$!
+          trap 'kill "$energy_pid" "$analytics_pid" "$migration_pid"' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --fail --silent http://127.0.0.1:8876/health >/dev/null &&
+               curl --fail --silent http://127.0.0.1:8766/api/status >/dev/null &&
+               curl --fail --silent http://127.0.0.1:8767/ >/dev/null; then break; fi
+            sleep 1
+          done
+          ENERGY_URL=http://127.0.0.1:8876/ node v2/energy_pulse/tests/browser.mjs
+          ANALYTICS_URL=http://127.0.0.1:8766/ node v2/governed_analytics/tests/browser.mjs
+          MIGRATION_URL=http://127.0.0.1:8767/ node v2/migration_assurance/tests/browser.mjs

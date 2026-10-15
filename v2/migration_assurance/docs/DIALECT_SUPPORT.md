@@ -1,0 +1,7 @@
+# SQLite → DuckDB subset v1
+
+The parser accepts exactly one top-level SELECT over the declared `orders` table. Supported expressions are projection/aliases, literals, declared columns, comparisons, Boolean expressions, NULL tests, arithmetic, `COALESCE`, `CASE`, `CAST`, `IN`, `BETWEEN`, `SUM`/`COUNT`/`MIN`/`MAX`/`AVG`, `WHERE`, `GROUP BY`, `HAVING`, `ORDER BY`, and `LIMIT` **only with ORDER BY**. Actual suite coverage is narrower than this allowlist; extension requires both dialect execution and adversarial tests. All translation uses SQLGlot with explicit `read='sqlite'`, `dialect='duckdb'`, and unsupported errors. Generated SQL, rule inventory and parser version appear in the report.
+
+Explicitly rejected for REVIEW: DDL/DML, multiple statements, other tables, joins, CTEs, subqueries, unknown columns, unapproved functions/UDFs, `PRAGMA`, `ATTACH`, dynamic SQL, stored procedures, hints, recursive queries, unordered LIMIT, and parser failures. SQLite aliases/identifier case semantics beyond the fixture cases are not certified. SQLGlot may support more syntax than this product permits; it does not expand the claim.
+
+Ordering is compared only when a case explicitly declares `ordered=true` and its source SQL has ORDER BY. A query with no ORDER BY can be compared as a result multiset, including duplicate counts, but never gets an ordering claim. The current date field is an ISO string, not timezone-aware timestamp data; timezone transformation is out of scope and should be reviewed rather than assumed.

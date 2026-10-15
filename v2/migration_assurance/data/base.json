@@ -1,0 +1,9 @@
+{
+  "orders": [
+    {"order_id":"A-001","amount":"10.00","status":"paid","region":"north","quantity":2,"ordered_on":"2026-01-01"},
+    {"order_id":"A-002","amount":null,"status":"paid","region":"south","quantity":1,"ordered_on":"2026-01-02"},
+    {"order_id":"A-003","amount":"15.50","status":"cancelled","region":"north","quantity":3,"ordered_on":"2026-01-03"},
+    {"order_id":"A-004","amount":"10.00","status":"paid","region":"north","quantity":2,"ordered_on":"2026-01-04"},
+    {"order_id":"A-005","amount":"0.00","status":"pending","region":"west","quantity":1,"ordered_on":"2026-01-05"}
+  ]
+}

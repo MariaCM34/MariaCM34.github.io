@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from .pipeline import build, ingest, migrate
+from .pipeline import backfill, build, ingest, migrate
 from .producer import produce
 
 
@@ -29,6 +29,10 @@ def main(argv: list[str] | None = None) -> int:
     model = sub.add_parser("build")
     model.add_argument("--db", type=Path, required=True)
     model.add_argument("--manifest", type=Path, required=True)
+    review = sub.add_parser("backfill")
+    review.add_argument("--db", type=Path, required=True)
+    review.add_argument("--event-id", required=True)
+    review.add_argument("--reason", required=True)
     demo = sub.add_parser("demo")
     demo.add_argument("--out-dir", type=Path, default=Path("data/generated"))
     demo.add_argument("--seed", type=int, default=42)
@@ -42,12 +46,14 @@ def main(argv: list[str] | None = None) -> int:
         result = produce(args.out, seed=args.seed, slots=args.slots)
     elif args.command == "migrate":
         migrate(args.db)
-        result = {"database": str(args.db), "migration": 1}
+        result = {"database": str(args.db), "migration": 3}
     elif args.command == "ingest":
         result = ingest(args.db, args.source)
     elif args.command == "build":
         manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
         result = build(args.db, start=datetime.fromisoformat(manifest["start_utc"].replace("Z", "+00:00")), slots=manifest["slots"])
+    elif args.command == "backfill":
+        result = backfill(args.db, event_id=args.event_id, reason=args.reason)
     elif args.command == "demo":
         args.out_dir.mkdir(parents=True, exist_ok=True)
         source = args.out_dir / "events.jsonl"

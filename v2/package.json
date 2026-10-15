@@ -1,0 +1,11 @@
+{
+  "name": "portfolio-v2-browser-checks",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "test:energy-browser": "node energy_pulse/tests/browser.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

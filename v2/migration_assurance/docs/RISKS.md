@@ -1,0 +1,9 @@
+# Security, limitations, and residual risks
+
+- **Trust boundary:** the CLI accepts a local case supplied by a trusted engineer. It is not a multi-tenant SQL sandbox. Do not expose the CLI or a write endpoint publicly. A future hosted API needs authentication, per-tenant isolation, strict read-only DB credentials, hard wall-clock/memory limits, rate limits, logging and abuse testing.
+- **Arbitrary SQL:** exactly one SELECT plus AST allowlist, table/column allowlist and result/fixture caps reduce risk; they do not make arbitrary attacker-controlled SQL safe. Unsupported or ambiguous constructs return REVIEW without success.
+- **Data:** all checked-in rows are synthetic. The static HTML escapes case and diff content. No credentials, client names, or proprietary schemas belong in cases or reports.
+- **Correctness:** SQLite's DECIMAL affinity may use floating point while DuckDB uses DECIMAL. Declared scale/tolerance is visible, but not an exact financial proof. Locale/collation, timezone conversions, ties in ordering, arithmetic overflow, and larger data distributions remain untested. SQLGlot translation is only syntactic.
+- **Operational:** temporary DBs are removed after runs; retained JSON reports/rows and fixture files are the evidence. SHA-256 detects accidental changes but is not authenticated signing. Run ID is random, so repeated input yields a new artifact with stable hashes/verdict. A production evidence store needs retention and tamper controls.
+- **Cost/scaling:** no required paid service; only small local fixtures were assessed. CI quota and engineering labor are real costs. Memory and query runtimes are bounded imperfectly in this local CLI; public or large-scale operation is not supported.
+- **Claims:** no SQL Server or Snowflake was connected. A green SQLite→DuckDB fixture result cannot be sold as SQL Server→Snowflake migration equivalence or production readiness.

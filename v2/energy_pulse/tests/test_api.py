@@ -13,7 +13,7 @@ def test_api_reads_persisted_lineage_and_rejects_bad_filters(tmp_path):
     ingest(db, source)
     build(db, start=datetime(2026, 10, 15, tzinfo=timezone.utc), slots=12)
     client = TestClient(create_app(db))
-    assert client.get("/health").json() == {"status": "ok", "schema_version": 1, "synthetic": True}
+    assert client.get("/health").json() == {"status": "ok", "schema_version": 3, "synthetic": True}
     readings = client.get("/api/measurements", params={"asset_id": "PUMP-A102", "metric": "temperature"}).json()
     assert len(readings["items"]) == 12
     assert readings["items"][5]["value"] == 84.3
@@ -24,6 +24,9 @@ def test_api_reads_persisted_lineage_and_rejects_bad_filters(tmp_path):
     assert lineage["gold"]["received_samples"] == 4
     assert [t["state"] for t in lineage["transitions"]] == ["OPEN", "CLOSED"]
     assert client.get("/api/measurements", params={"asset_id": "UNKNOWN", "metric": "temperature"}).status_code == 422
+    for invalid in ["2026-10-15", "2026-10-15T00:00:00+05:00", "2026-02-30T00:00:00Z"]:
+        assert client.get("/api/measurements", params={"asset_id": "PUMP-A102", "metric": "temperature", "start": invalid}).status_code == 422
+    assert client.get("/api/measurements", params={"asset_id": "PUMP-A102", "metric": "temperature", "start": "2026-10-16T00:00:00Z", "end": "2026-10-15T00:00:00Z"}).status_code == 422
     assert client.get("/api/quality", params={"limit": 5000}).status_code == 422
     assert client.get("/api/incidents/UNKNOWN/lineage").status_code == 404
     assert client.get("/").status_code == 200
