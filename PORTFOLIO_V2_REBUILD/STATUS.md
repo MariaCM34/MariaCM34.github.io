@@ -2,6 +2,14 @@
 
 **Date:** 2026-10-15. **Branch:** `portfolio-v2`. **Public release:** V1 remains on `main`; V2 has not been merged or deployed to GitHub Pages. This file records tested implementation state, not a claim of production use.
 
+## Independent release audit update
+
+- A clean checkout of source commit `f26aed45d0ea8fb019dbe292ac442426a62c54a6` ran all three generators/loaders/reconcilers twice. The curated static export was regenerated with that source commit and reproduced exactly as structured data except for export time. An earlier snapshot from `aac6680` had the same observed results but OS-dependent hashes/run IDs; `.gitattributes`, LF JSONL/case writers, and regression checks corrected that provenance defect.
+- Independent source arithmetic reconciled Energy 106 unique JSONL IDs to Bronze/Silver, a 3/4 missing-slot hour and the 84.3 °C incident; Analytics 4,000 unique orders, 8,000 unique lines and four monthly currency totals (April USD 6,145,024 minor units); Migration 17 distinct cases and the A-001 10.00-versus-11.00 discrepancy executed on SQLite and DuckDB.
+- A mobile visual audit found 399 px document width at a 390 px viewport in Governed Analytics when a result was visible. The grid was bounded, the result table became keyboard-scrollable, and the browser regression now checks the visible result. Eight final local screenshots cover desktop/mobile Energy, Analytics, Migration and showcase; all have no document-level horizontal overflow. Showcase links now describe code/local setup accurately.
+- Final clean-checkout local result: **44 V2 Python tests passed**, **23 V1 Node tests passed**, **four desktop/mobile browser flows passed**, `pip check` found no broken requirements. One Starlette/httpx deprecation warning remains. Credential-pattern and curated-export path-marker scans found no matches; generated database/report files are ignored.
+- The release decisions and exact open gates are in [`../V2_RELEASE_READINESS.md`](../V2_RELEASE_READINESS.md). All three are **CONDITIONAL PASS** for the documented local reference scope; public V2 Pages verification remains unavailable by instruction. Local `portfolio-v2` is ahead of the remote at this audit checkpoint; final evidence/report commit, push and CI are next. Remote `main` must remain V1.
+
 ## Preservation and recovery
 
 - Verified local and remote `main` at `adcbfa7175acd65eba4cc322c17ae6ac4f382c7a`; tagged it locally as `v1-preserved-adcbfa7`. The development branch was created from this SHA without rewriting history.
@@ -31,12 +39,12 @@ Each package has contracts, architecture diagram, data dictionary, ADR/runbook, 
 
 `v2/showcase/` exports a small curated `evidence.json` from the three executed local systems and renders it with a responsive bilingual static page. It labels the export frozen/synthetic and distinguishes it from the runnable local APIs. A local Playwright flow passed on 1280×800 and 390×844, exercising the sensor gap, governed metric/currency selection, a failed typed diff, keyboard language switching, and missing-export state. The committed snapshot has 106 Bronze rows, 12,723 governed source rows, and 17 executed migration decisions. A repeat export matched the committed payload exactly after excluding only its source-commit and export-time metadata. A content scan found no local absolute paths or credential markers in `evidence.json`.
 
-Commit `a72b337356682f18728b54f69c5c4f2833e608aa` added the showcase and expanded CI to regenerate it. [GitHub Actions run 38753659110](https://github.com/MariaCM34/MariaCM34.github.io/actions/runs/38753659110) **completed successfully**, including the three application browser flows and the static showcase browser flow. Subsequent exporter hardening checks the EnergyPulse source hash against the manifest and successful ingestion, plus exact reviewed migration case IDs/statuses; that follow-up must pass CI before it is treated as verified.
+Commit `a72b337356682f18728b54f69c5c4f2833e608aa` added the showcase and expanded CI to regenerate it. [GitHub Actions run 38753659110](https://github.com/MariaCM34/MariaCM34.github.io/actions/runs/38753659110) **completed successfully**, including the three application browser flows and the static showcase browser flow. Commit `a2ed03fb2e104e2f741ed6dc3169a9bfbea581e0` hardened the exporter to check the EnergyPulse source hash against the manifest and successful ingestion, plus exact reviewed migration case IDs/statuses. [GitHub Actions run 38754152711](https://github.com/MariaCM34/MariaCM34.github.io/actions/runs/38754152711) **completed successfully** for that commit.
 
 ## Next actions
 
-1. Commit exporter provenance hardening and this status update; push only `portfolio-v2` and require CI to pass for that change.
-2. Recheck remote `main` and development branch refs. Keep public Pages unchanged until V2 has an explicit release decision.
-3. Continue product QA and acceptance review from the three runbooks; do not present the frozen page as a live hosted application.
+1. Commit only curated final evidence, screenshots and audit documentation; push `portfolio-v2`, then require the final CI run to pass and verify both remote branch refs.
+2. Keep public Pages unchanged until a separately reviewed V2 release decision; remote `main` must remain `adcbfa7`.
+3. Continue product QA against the three runbooks; the frozen page must never be presented as a live hosted application.
 
 Gate 0/1 audit and architecture decisions are in [`docs/06_ARCHITECTURE_GATE_1.md`](docs/06_ARCHITECTURE_GATE_1.md). Reproduction starts at [`../v2/README.md`](../v2/README.md).
