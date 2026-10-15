@@ -40,7 +40,9 @@ function setLanguage(next) {
   lang = next; document.documentElement.lang = next;
   for (const el of document.querySelectorAll('[data-i]')) { const value = t[next][el.dataset.i]; if (value !== undefined) { if (el.dataset.i === 'footer') el.innerHTML = value; else el.textContent = value; } }
   for (const code of ['es','en']) $(code).setAttribute('aria-pressed', String(code === next));
-  renderChecks(); if (wasReviewed) review(); else reset();
+  renderChecks();
+  if (wasReviewed) review();
+  else { $('result').textContent = t[next].waiting; $('status').textContent = t[next].ready; }
 }
 $('sample').addEventListener('change', reset);
 $('reset').addEventListener('click', reset);
