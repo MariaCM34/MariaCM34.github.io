@@ -1,0 +1,19 @@
+name: Portfolio checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check portfolio structure
+        run: node --test tests/*.test.mjs
+      - name: Check potential tracked secrets
+        run: |
+          if grep -R -n -E '(sk-proj-[A-Za-z0-9]{24,}|BEGIN (RSA |OPENSSH )?PRIVATE KEY)' --include='*.js' --include='*.json' --include='*.html' projects index.html; then exit 1; fi
