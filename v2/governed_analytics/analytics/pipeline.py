@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 
 
 def _write(path: Path, rows: list[dict]) -> None:
-    path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8")
+    path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in rows), encoding="utf-8", newline="\n")
 
 
 def generate(directory: Path = DATA, order_count: int = 4000) -> dict:

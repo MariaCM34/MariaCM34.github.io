@@ -2,6 +2,8 @@
 
 Three synthetic, local reference implementations share pinned Python 3.12 dependencies and one browser-test lockfile. They are designed to show actual source-to-consumption flows, not to imply that GitHub Pages runs a backend. Public `main` remains the V1 site until V2's release gates pass.
 
+The [static evidence showcase](showcase/README.md) is a separate GitHub Pages-compatible **frozen export** generated from all three executed systems. Its interactive charts and filters select source-backed exported results; the full APIs, ingestion, query execution and reconciliation run locally.
+
 | Product | Buyer problem | Executed path | Local UI |
 | --- | --- | --- | --- |
 | [EnergyPulse](energy_pulse/README.md) | Industrial analyst needs trustworthy readings, quality gaps and explainable incidents | JSONL → SQLite Bronze/Silver/Gold → FastAPI → SVG/table/lineage | `http://127.0.0.1:8876/` |
@@ -28,7 +30,7 @@ v2/.venv/Scripts/python.exe -m pytest v2/energy_pulse/tests v2/governed_analytic
 
 Start the three local servers in separate terminals using the commands in each package README. The Migration Assurance server is `python -m http.server 8767 --bind 127.0.0.1 --directory v2/migration_assurance/artifacts/demo`. With servers running, execute the three `tests/browser.mjs` scripts via Node. On macOS/Linux, use `v2/.venv/bin/python` and colon-separated `PYTHONPATH`. CI repeats seed/build/test/browser flows in `.github/workflows/v2-validation.yml`.
 
-The current local combined result is **44 Python tests passed**, **23 V1 Node regressions passed**, and **three desktop/mobile browser flows passed**. Per-module statement coverage of five critical business modules is 85.8–95.0%. This is local evidence before a clean-checkout/remote CI run; see the package test-evidence documents and [`STATUS.md`](../PORTFOLIO_V2_REBUILD/STATUS.md) for current gates.
+The combined result is **44 Python tests passed**, **23 V1 Node regressions passed**, and **four desktop/mobile browser flows passed** (three local applications plus the static showcase). Per-module statement coverage of five critical business modules is 85.8–95.0%. A clean detached checkout reproduced the source-to-result flows. [GitHub Actions validation](https://github.com/MariaCM34/MariaCM34.github.io/actions/workflows/v2-validation.yml) reruns the tests, builds all datasets, regenerates the frozen export and tests the four browser flows; see the package test-evidence documents and [`STATUS.md`](../PORTFOLIO_V2_REBUILD/STATUS.md) for exact run results.
 
 ## Architecture and limits
 

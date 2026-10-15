@@ -73,6 +73,8 @@ def test_semantic_catalog_snapshot_requires_intentional_review():
 def test_source_volume_and_idempotent_rebuild(tmp_path):
     source = generate(tmp_path, 4000)
     assert sum(source["source_counts"].values()) >= 10_000
+    assert all(b"\r" not in (tmp_path / f"{name}.jsonl").read_bytes()
+               for name in ("products", "orders", "order_lines", "returns"))
     first = build(tmp_path)
     second = build(tmp_path)
     assert first["accepted"] == second["accepted"]

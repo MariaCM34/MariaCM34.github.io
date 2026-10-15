@@ -1,6 +1,6 @@
 # Test evidence — local reference implementation
 
-**Observed environment:** Windows; Python 3.12.14; SQLite 3.53.1; DuckDB 1.5.6; SQLGlot 30.23.0; pytest 9.1.1. The shared `v2/requirements.lock` supplies the pinned V2 environment. All data is synthetic. Evidence was run on 2026-10-15 UTC in a working V2 branch; reports generated before the package's integration commit indicate a dirty package and must be regenerated after commit for a clean release snapshot.
+**Observed environment:** Windows; Python 3.12.14; SQLite 3.53.1; DuckDB 1.5.6; SQLGlot 30.23.0; pytest 9.1.1. The shared `v2/requirements.lock` supplies the pinned V2 environment. All data is synthetic. Evidence was run on 2026-10-15 UTC. Reports were regenerated after integration commit `aac668016c25f9dfe46e01de18dd50f0162c4e7b` for the clean frozen showcase.
 
 From repository root:
 
@@ -14,6 +14,6 @@ v2/.venv/Scripts/python.exe -m migration_assurance.cli suite --out v2/migration_
 
 HTTP smoke test: Python's `ThreadingHTTPServer` served the generated `index.html` via `127.0.0.1`; `urllib.request.urlopen` returned **HTTP 200, 7,648 bytes**. The subsequent Playwright browser test passed on desktop 1280×800 and mobile 390×844: it filtered 17 cases to 2 FAIL cases, followed the deliberate mismatch report, verified the A-001 field difference and engine labels, and found no horizontal overflow.
 
-The generated artifacts under `artifacts/` are ignored by Git. They include versioned case copies and fixtures, JSON reports, both engines' executed rows, individual HTML reports and an index with decision filtering. `git check-ignore` confirmed the generated index is ignored. For a releasable Pages evidence export, regenerate on the exact integrated commit, run browser E2E at desktop/mobile, verify no private paths/data, and record the final commit and CI URL.
+The generated artifacts under `artifacts/` are ignored by Git. They include versioned case copies and fixtures, JSON reports, both engines' executed rows, individual HTML reports and an index with decision filtering. `git check-ignore` confirmed the generated index is ignored. The curated [frozen showcase export](../../showcase/README.md) was regenerated from the 17 executed reports and passed desktop/mobile browser E2E; it is not a hosted migration engine.
 
-Coverage of `migration_assurance.engine` is **85.8%** statement coverage using pinned pytest-cov/coverage. Independent cross-review was performed and its P1 ordering finding corrected; CI at an integrated commit and public V2 deployment remain pending. This is a **reference implementation**, not production-ready or deployed V2.
+Coverage of `migration_assurance.engine` is **85.8%** statement coverage using pinned pytest-cov/coverage. Independent cross-review was performed and its P1 ordering finding corrected. [CI run 38754152711](https://github.com/MariaCM34/MariaCM34.github.io/actions/runs/38754152711) passed the integrated execution, tests and browser flows. Public V2 deployment remains pending. This is a **reference implementation**, not production-ready or deployed V2.

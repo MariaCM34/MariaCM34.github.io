@@ -1,6 +1,6 @@
 # Test evidence
 
-Build and test commands are listed in `README.md`. Evidence must be updated with the exact integration commit and CI run before a public V2 claim; this local builder file is not an independent reviewer sign-off.
+Build and test commands are listed in `README.md`. Integration commit `aac668016c25f9dfe46e01de18dd50f0162c4e7b` passed [CI run 38751666431](https://github.com/MariaCM34/MariaCM34.github.io/actions/runs/38751666431); the showcase/provenance follow-up `a2ed03fb2e104e2f741ed6dc3169a9bfbea581e0` passed [CI run 38754152711](https://github.com/MariaCM34/MariaCM34.github.io/actions/runs/38754152711). This file describes local synthetic reference evidence, not public API hosting.
 
 | Check | Observed local result |
 |---|---|
@@ -16,4 +16,4 @@ Build and test commands are listed in `README.md`. Evidence must be updated with
 | Browser E2E | Playwright 1.62.1 with locally installed Chrome passed desktop 1280×800 and mobile 390×844: loaded snapshot, executed net sales SQL, inspected returned table/chart and exact SQL, ran a category filter, then rejected an invalid date range and cleared the previous result. No horizontal overflow. |
 | Evidence export | 8 executed metric/currency queries written to ignored `data/export/analytics-evidence.json`; current local build run ID `8efb27e007e5dea3` and matching Parquet generation. |
 
-Critical-module statement coverage is **88.2%** for `analytics.pipeline` and **95.0%** for `analytics.semantic`. The independent coordinator review found and the builder fixed a possible Parquet/warehouse publication mismatch after a DB-swap failure, plus SQLite audit handle leaks; targeted tests now cover both. Remaining release evidence: CI at integration SHA and any public Pages route inspection. The local server UI is not evidence of a hosted live API.
+Critical-module statement coverage is **88.2%** for `analytics.pipeline` and **95.0%** for `analytics.semantic`. The independent coordinator review found and the builder fixed a possible Parquet/warehouse publication mismatch after a DB-swap failure, plus SQLite audit handle leaks; targeted tests now cover both. CI at the integration SHA passed. Public V2 Pages route inspection remains open because `main` deliberately remains V1. The local server UI is not evidence of a hosted live API.

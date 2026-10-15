@@ -19,6 +19,7 @@ try {
     assert.match(await page.locator('#sql').innerText(), /FROM fct_order_lines/);
     assert.ok(await page.locator('#tbody tr').count() > 0);
     assert.ok(await page.locator('#chart').locator('div').count() > 0);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
     await page.locator('#metric').selectOption('net_sales_by_category');
     await page.locator('#category').selectOption('tools');
     await page.locator('#run').click();

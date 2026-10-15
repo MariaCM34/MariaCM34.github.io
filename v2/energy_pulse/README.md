@@ -1,8 +1,8 @@
 # EnergyPulse V2 — synthetic telemetry reliability reference
 
-**Status:** executable local vertical slice; not yet independently reviewed or published as a V2 product. All assets, readings, incidents and sites are synthetic. Not for safety-critical control or live operations.
+**Status:** independently reviewed and CI-validated local reference implementation; not published as a V2 Pages product. All assets, readings, incidents and sites are synthetic. Not for safety-critical control or live operations.
 
-An industrial energy-operations team needs to see whether a sensor is abnormal, missing or stale, and trace a decision to its original reading. EnergyPulse separates a deterministic JSONL producer, a contract-checking ingestion process, SQLite Bronze/Silver/Gold layers, a versioned incident processor, a read-only FastAPI service and a browser dashboard. GitHub Pages can later show a clearly labeled exported run; it cannot run this backend.
+An industrial energy-operations team needs to see whether a sensor is abnormal, missing or stale, and trace a decision to its original reading. EnergyPulse separates a deterministic JSONL producer, a contract-checking ingestion process, SQLite Bronze/Silver/Gold layers, a versioned incident processor, a read-only FastAPI service and a browser dashboard. The [static showcase](../showcase/README.md) contains a clearly labeled frozen export from an executed run; GitHub Pages cannot run this backend.
 
 ```mermaid
 flowchart LR
@@ -50,6 +50,6 @@ The default count is derived from the generator design (3 assets × 3 metrics ×
 
 ## Current scope and evidence
 
-The local 12-slot vertical slice ran separate producer/ingest/build processes: 106 emitted and accepted, 106 Silver rows, 27 Gold rows, one incident; repeated API requests returned HTTP 200. The current test result is recorded in [TEST_EVIDENCE.md](docs/TEST_EVIDENCE.md). The system is a reference candidate, not a completed release: independent review, fresh-clone CI, broader fault recovery, performance evidence and final Pages export remain open.
+The local 12-slot run used separate producer/ingest/build processes: 106 emitted and accepted, 106 Silver rows, 27 Gold rows, one incident. Independent review fixed false coverage and lineage cases, and clean-checkout CI passed the integration, negative, and browser tests. The current evidence is in [TEST_EVIDENCE.md](docs/TEST_EVIDENCE.md). Performance and operational scale remain unmeasured; no V2 Pages deployment has occurred.
 
 See [architecture and grain](docs/ARCHITECTURE.md), [data dictionary](docs/DATA_DICTIONARY.md), [operations](docs/RUNBOOK.md), [security](docs/THREAT_MODEL.md), and [trade-offs](docs/ADRS/001-batch-vs-queue.md).
