@@ -8,7 +8,7 @@
 - Independent source arithmetic reconciled Energy 106 unique JSONL IDs to Bronze/Silver, a 3/4 missing-slot hour and the 84.3 °C incident; Analytics 4,000 unique orders, 8,000 unique lines and four monthly currency totals (April USD 6,145,024 minor units); Migration 17 distinct cases and the A-001 10.00-versus-11.00 discrepancy executed on SQLite and DuckDB.
 - A mobile visual audit found 399 px document width at a 390 px viewport in Governed Analytics when a result was visible. The grid was bounded, the result table became keyboard-scrollable, and the browser regression now checks the visible result. Eight final local screenshots cover desktop/mobile Energy, Analytics, Migration and showcase; all have no document-level horizontal overflow. Showcase links now describe code/local setup accurately.
 - Final clean-checkout local result: **44 V2 Python tests passed**, **23 V1 Node tests passed**, **four desktop/mobile browser flows passed**, `pip check` found no broken requirements. One Starlette/httpx deprecation warning remains. Credential-pattern and curated-export path-marker scans found no matches; generated database/report files are ignored.
-- The release decisions and exact open gates are in [`../V2_RELEASE_READINESS.md`](../V2_RELEASE_READINESS.md). All three are **CONDITIONAL PASS** for the documented local reference scope; public V2 Pages verification remains unavailable by instruction. Local `portfolio-v2` is ahead of the remote at this audit checkpoint; final evidence/report commit, push and CI are next. Remote `main` must remain V1.
+- The release decisions and exact open gates are in [`../V2_RELEASE_READINESS.md`](../V2_RELEASE_READINESS.md). All three are **CONDITIONAL PASS** for the documented local reference scope; public V2 Pages verification remains unavailable by instruction. The audit and refreshed evidence were pushed in `9784f6b1ab10aa85fe081baa9c87e6cb5c223e44`; [CI run 38762261720](https://github.com/MariaCM34/MariaCM34.github.io/actions/runs/38762261720) **passed** V1/V2, coverage and four browser flows. Remote `main` remained V1 at the post-push ref check.
 
 ## Preservation and recovery
 
@@ -43,8 +43,8 @@ Commit `a72b337356682f18728b54f69c5c4f2833e608aa` added the showcase and expande
 
 ## Next actions
 
-1. Commit only curated final evidence, screenshots and audit documentation; push `portfolio-v2`, then require the final CI run to pass and verify both remote branch refs.
-2. Keep public Pages unchanged until a separately reviewed V2 release decision; remote `main` must remain `adcbfa7`.
-3. Continue product QA against the three runbooks; the frozen page must never be presented as a live hosted application.
+1. Keep public Pages unchanged until a separately reviewed V2 release decision; remote `main` must remain `adcbfa7`.
+2. When publication is authorized, verify the exact public HTTPS route, project links, synthetic labeling and mobile behavior after deployment. A GitHub branch and green CI are not a public Pages demonstration.
+3. Preserve the local-only API boundary and continue targeted QA for accessibility, security advisories and performance before any production-style claim.
 
 Gate 0/1 audit and architecture decisions are in [`docs/06_ARCHITECTURE_GATE_1.md`](docs/06_ARCHITECTURE_GATE_1.md). Reproduction starts at [`../v2/README.md`](../v2/README.md).
