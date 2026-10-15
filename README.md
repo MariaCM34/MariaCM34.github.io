@@ -27,3 +27,5 @@ Observed locally on 14 October 2026: **23 tests passed, 0 failed** (5 portfolio 
 ## Integrity
 
 All demonstration readings and order data are seeded or bundled synthetic fixtures. EnergyPulse simulates replay, Ask Your Data computes in JavaScript and shows **illustrative SQL that is not executed**, and Modernize Studio accepts only three exact reviewed SQL examples. None is a claim about a client system or a production performance gain. For publication and evidence rules, see [PORTFOLIO_POLICY.md](PORTFOLIO_POLICY.md).
+
+The [overnight release report](OVERNIGHT_RELEASE_REPORT.md) records deployment URLs, test evidence, commits, and limitations.
