@@ -14,7 +14,7 @@ The fixture models one order line per row with `id`, ISO `date`, `product`, `cat
 
 ## Verification
 
-Run `node --test projects/ask-your-data/tests/*.test.mjs` from the repository root. On 2026-10-14, six tests passed, zero failed: bilingual intent mapping, unsupported input, date filter and empty range, cancellations and returns, null/negative amount handling, and invalid dates. The test suite reads the same fixture the browser uses.
+Run `node --test projects/ask-your-data/tests/*.test.mjs` from the repository root. On 2026-10-14, seven tests passed, zero failed: bilingual intent mapping, unsupported input, date filter and empty range, cancellations and returns, null/negative amount handling, invalid dates, and a UI state regression ensuring that an unsupported question clears prior evidence. The test suite reads the same fixture the browser uses.
 
 ## Limitations and reproducibility
 
