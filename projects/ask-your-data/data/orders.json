@@ -1,0 +1,19 @@
+[
+  {"id":"S001","date":"2026-01-04","product":"Aurora Lamp","category":"Home","quantity":2,"unitPrice":40,"discount":10,"status":"completed"},
+  {"id":"S002","date":"2026-01-09","product":"Trail Bottle","category":"Outdoor","quantity":3,"unitPrice":20,"discount":0,"status":"completed"},
+  {"id":"S003","date":"2026-01-15","product":"Linen Tote","category":"Accessories","quantity":1,"unitPrice":30,"discount":5,"status":"completed"},
+  {"id":"S004","date":"2026-01-21","product":"Aurora Lamp","category":"Home","quantity":1,"unitPrice":40,"discount":0,"status":"cancelled"},
+  {"id":"S005","date":"2026-01-25","product":"Trail Bottle","category":"Outdoor","quantity":1,"unitPrice":20,"discount":0,"status":"returned"},
+  {"id":"S006","date":"2026-02-03","product":"Aurora Lamp","category":"Home","quantity":1,"unitPrice":40,"discount":0,"status":"completed"},
+  {"id":"S007","date":"2026-02-08","product":"Trail Bottle","category":"Outdoor","quantity":4,"unitPrice":20,"discount":10,"status":"completed"},
+  {"id":"S008","date":"2026-02-13","product":"Linen Tote","category":"Accessories","quantity":2,"unitPrice":30,"discount":0,"status":"completed"},
+  {"id":"S009","date":"2026-02-19","product":"Aurora Lamp","category":"Home","quantity":1,"unitPrice":40,"discount":0,"status":"returned"},
+  {"id":"S010","date":"2026-02-26","product":"Linen Tote","category":"Accessories","quantity":1,"unitPrice":30,"discount":0,"status":"cancelled"},
+  {"id":"S011","date":"2026-03-02","product":"Aurora Lamp","category":"Home","quantity":3,"unitPrice":40,"discount":15,"status":"completed"},
+  {"id":"S012","date":"2026-03-06","product":"Trail Bottle","category":"Outdoor","quantity":2,"unitPrice":20,"discount":0,"status":"completed"},
+  {"id":"S013","date":"2026-03-11","product":"Linen Tote","category":"Accessories","quantity":3,"unitPrice":30,"discount":10,"status":"completed"},
+  {"id":"S014","date":"2026-03-17","product":"Aurora Lamp","category":"Home","quantity":1,"unitPrice":40,"discount":0,"status":"cancelled"},
+  {"id":"S015","date":"2026-03-22","product":"Trail Bottle","category":"Outdoor","quantity":1,"unitPrice":20,"discount":0,"status":"returned"},
+  {"id":"S016","date":"2026-03-28","product":"Linen Tote","category":"Accessories","quantity":2,"unitPrice":30,"discount":5,"status":"completed"},
+  {"id":"S017","date":"2026-03-29","product":"Sample Item","category":"Sample","quantity":1,"unitPrice":null,"discount":0,"status":"cancelled"}
+]
