@@ -11,7 +11,7 @@
    node --version
    ```
 
-3. Descomprime este ZIP en una carpeta personal, por ejemplo `C:\Dev\MariaCM34.github.io` (NO dentro de una carpeta del trabajo o TIWORKS).
+3. Descomprime este ZIP en una carpeta personal, por ejemplo `C:\Dev\MariaCM34.github.io` (NO dentro de una carpeta del trabajo).
 4. En el sitio de GitHub, con tu sesión `MariaCM34`, crea un repositorio **público** exactamente `MariaCM34.github.io` (preferiblemente vacío: sin auto-README). Esta operación debe hacerse con tu sesión de esa cuenta.
 5. Desde PowerShell dentro de la carpeta descomprimida:
 
