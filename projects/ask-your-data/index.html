@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Ask Your Data: a transparent synthetic retail analytics demonstration.">
+  <title>Ask Your Data | Transparent analytics demo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#workspace">Skip to demo</a>
+  <div class="shell">
+    <header class="topbar"><a class="brand" href="../../">MC<span>34</span> <small>/ LAB</small></a><div class="topright"><span class="signal" id="static-label">● STATIC DEMO</span><button id="language" class="lang" type="button" aria-label="Switch to Spanish">ES</button></div></header>
+    <main id="workspace">
+      <section class="hero"><div class="eyebrow" id="hero-eyebrow">01 / ANALYTICS ENGINEERING · SYNTHETIC RETAIL</div><div class="hero-grid"><div><h1>Ask Your <em>Data.</em></h1><p id="intro">Explore fictional retail performance with clear answers, visible calculations, and an explicit question allowlist.</p></div><div class="hero-note"><span class="note-index" id="problem-label">THE BUSINESS PROBLEM</span><p id="problem">Business teams need quick answers about sales and cancellations without an opaque query process. This prototype makes every step inspectable.</p></div></div></section>
+      <div class="notice" role="note"><strong id="demo-label">SYNTHETIC DEMO DATA</strong><span id="demo-copy">17 invented order lines from January–March 2026. Results are illustrative; no company or customer data.</span></div>
+      <div class="workgrid">
+        <section class="query-card" aria-labelledby="query-title"><div class="section-head"><span class="index">01 / ASK</span><h2 id="query-title">What would you like to know?</h2></div><form id="query-form"><label for="question" id="question-label">Business question</label><div class="input-wrap"><input id="question" maxlength="180" placeholder="e.g. Show monthly net sales" autocomplete="off" required><button type="submit" id="run">Run analysis <span aria-hidden="true">↗</span></button></div><div class="filters"><label><span id="from-label">From</span><input id="start" type="date" value="2026-01-01" required></label><label><span id="to-label">To</span><input id="end" type="date" value="2026-03-31" required></label></div></form><div class="suggestions"><span id="suggestions-title">TRY A QUESTION</span><div id="suggestion-list"></div></div><p class="hint" id="hint">Uses explicit pattern matching. Unrecognized questions return a clear unsupported state.</p></section>
+        <section class="result-card" aria-labelledby="result-title"><div class="section-head result-head"><div><span class="index">02 / RESULT</span><h2 id="result-title">Analysis output</h2></div><span id="state-badge" class="state-badge">READY</span></div><div id="message" class="message" role="status" aria-live="polite">Choose a question to inspect the synthetic dataset.</div><div id="result" hidden><div class="result-summary"><div><span id="intent-label">MATCHED INTENT</span><strong id="intent"></strong></div><div><span id="scope-label">DATE SCOPE</span><strong id="scope"></strong></div></div><div id="chart" class="chart" role="img"></div><div class="table-scroll"><table><caption id="table-caption">Computed result</caption><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div></div></section>
+      </div>
+      <section class="evidence" aria-labelledby="evidence-title"><div class="section-head"><span class="index">03 / TRACE</span><h2 id="evidence-title">How the answer was made</h2></div><div class="evidence-grid"><div><h3 id="source-title">Source & filters</h3><p id="source-copy">Bundled JSON fixture: <code>data/orders.json</code>. No network analytics service.</p><dl><div><dt id="scanned-label">Rows scanned</dt><dd id="scanned">—</dd></div><div><dt id="excluded-label">Invalid amount rows</dt><dd id="excluded">—</dd></div><div><dt id="filter-label">Applied filter</dt><dd id="filter">—</dd></div></dl></div><div><h3 id="sql-title">Illustrative SQL template</h3><p id="sql-explain">The browser runs deterministic JavaScript over JSON. This SQL shows an equivalent analytical shape; it is not executed.</p><pre id="sql">Select a supported question to see its template.</pre></div></div><p id="method" class="method">Completed lines add gross quantity × price and net after discount. Returns subtract from net; cancellations add no sales. Invalid amounts contribute zero.</p></section>
+      <footer><span id="footer-label">ASK YOUR DATA / SYNTHETIC PROTOTYPE</span><a id="footer-link" href="README.md">Architecture & tests ↗</a></footer>
+    </main>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
