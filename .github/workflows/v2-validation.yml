@@ -58,3 +58,16 @@ jobs:
           ENERGY_URL=http://127.0.0.1:8876/ node v2/energy_pulse/tests/browser.mjs
           ANALYTICS_URL=http://127.0.0.1:8766/ node v2/governed_analytics/tests/browser.mjs
           MIGRATION_URL=http://127.0.0.1:8767/ node v2/migration_assurance/tests/browser.mjs
+          python -m analytics.export
+          python v2/showcase/export.py \
+            --energy-db v2/energy_pulse/data/generated/ci/energy.sqlite \
+            --analytics-export v2/governed_analytics/data/export/analytics-evidence.json \
+            --migration-reports v2/migration_assurance/artifacts/ci
+          python -m http.server 8768 --bind 127.0.0.1 --directory v2/showcase &
+          showcase_pid=$!
+          trap 'kill "$energy_pid" "$analytics_pid" "$migration_pid" "$showcase_pid"' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --fail --silent http://127.0.0.1:8768/evidence.json >/dev/null; then break; fi
+            sleep 1
+          done
+          SHOWCASE_URL=http://127.0.0.1:8768/ node v2/showcase/browser.mjs

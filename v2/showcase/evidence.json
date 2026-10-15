@@ -1,0 +1,1090 @@
+{
+  "analytics": {
+    "queries": [
+      {
+        "bound_parameters": [
+          "2026-04-01",
+          "2026-06-01",
+          "USD",
+          "2026-04-01",
+          "2026-06-01",
+          "USD"
+        ],
+        "currency": "USD",
+        "definition": {
+          "formula": "completed line value after discount, less accepted returns in acceptance month",
+          "grain": "UTC month and currency",
+          "label": "Net sales",
+          "unit": "minor currency units"
+        },
+        "metric": "net_sales",
+        "row_count": 2,
+        "rows": [
+          {
+            "currency": "USD",
+            "period": "2026-04",
+            "return_rows": 164,
+            "sales_rows": 3102,
+            "value": 6145024
+          },
+          {
+            "currency": "USD",
+            "period": "2026-05",
+            "return_rows": 173,
+            "sales_rows": 2960,
+            "value": 5954493
+          }
+        ],
+        "sql_executed": "WITH sales AS (SELECT strftime(event_at, '%Y-%m') AS period, currency,\n sum(sales_minor) AS amount, count(*) AS row_count\nFROM fct_order_lines WHERE status = 'completed' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2), returns AS (SELECT strftime(event_at, '%Y-%m') AS period, currency,\n sum(amount_minor) AS amount, count(*) AS row_count\nFROM fct_returns WHERE status = 'accepted' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2),\n keys AS (SELECT period, currency FROM sales UNION SELECT period, currency FROM returns)\nSELECT keys.period, keys.currency,\n coalesce(sales.amount, 0) - coalesce(returns.amount, 0) AS value,\n coalesce(sales.row_count, 0) AS sales_rows, coalesce(returns.row_count, 0) AS return_rows\nFROM keys LEFT JOIN sales ON keys.period = sales.period AND keys.currency = sales.currency\nLEFT JOIN returns ON keys.period = returns.period AND keys.currency = returns.currency\nORDER BY 1, 2 LIMIT 500"
+      },
+      {
+        "bound_parameters": [
+          "2026-04-01",
+          "2026-06-01",
+          "COP",
+          "2026-04-01",
+          "2026-06-01",
+          "COP"
+        ],
+        "currency": "COP",
+        "definition": {
+          "formula": "completed line value after discount, less accepted returns in acceptance month",
+          "grain": "UTC month and currency",
+          "label": "Net sales",
+          "unit": "minor currency units"
+        },
+        "metric": "net_sales",
+        "row_count": 2,
+        "rows": [
+          {
+            "currency": "COP",
+            "period": "2026-04",
+            "return_rows": 80,
+            "sales_rows": 619,
+            "value": 196597500
+          },
+          {
+            "currency": "COP",
+            "period": "2026-05",
+            "return_rows": 90,
+            "sales_rows": 593,
+            "value": 189121000
+          }
+        ],
+        "sql_executed": "WITH sales AS (SELECT strftime(event_at, '%Y-%m') AS period, currency,\n sum(sales_minor) AS amount, count(*) AS row_count\nFROM fct_order_lines WHERE status = 'completed' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2), returns AS (SELECT strftime(event_at, '%Y-%m') AS period, currency,\n sum(amount_minor) AS amount, count(*) AS row_count\nFROM fct_returns WHERE status = 'accepted' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2),\n keys AS (SELECT period, currency FROM sales UNION SELECT period, currency FROM returns)\nSELECT keys.period, keys.currency,\n coalesce(sales.amount, 0) - coalesce(returns.amount, 0) AS value,\n coalesce(sales.row_count, 0) AS sales_rows, coalesce(returns.row_count, 0) AS return_rows\nFROM keys LEFT JOIN sales ON keys.period = sales.period AND keys.currency = sales.currency\nLEFT JOIN returns ON keys.period = returns.period AND keys.currency = returns.currency\nORDER BY 1, 2 LIMIT 500"
+      },
+      {
+        "bound_parameters": [
+          "2026-04-01",
+          "2026-06-01",
+          "USD"
+        ],
+        "currency": "USD",
+        "definition": {
+          "formula": "completed line quantity \u00d7 unit price before discount",
+          "grain": "UTC month and currency",
+          "label": "Gross sales",
+          "unit": "minor currency units"
+        },
+        "metric": "gross_sales",
+        "row_count": 2,
+        "rows": [
+          {
+            "currency": "USD",
+            "period": "2026-04",
+            "source_rows": 3102,
+            "value": 6308724
+          },
+          {
+            "currency": "USD",
+            "period": "2026-05",
+            "source_rows": 2960,
+            "value": 6121401
+          }
+        ],
+        "sql_executed": "SELECT strftime(event_at, '%Y-%m') AS period, currency,\n sum(gross_minor) AS value, count(*) AS source_rows\nFROM fct_order_lines WHERE status = 'completed' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2 ORDER BY 1, 2 LIMIT 500"
+      },
+      {
+        "bound_parameters": [
+          "2026-04-01",
+          "2026-06-01",
+          "COP"
+        ],
+        "currency": "COP",
+        "definition": {
+          "formula": "completed line quantity \u00d7 unit price before discount",
+          "grain": "UTC month and currency",
+          "label": "Gross sales",
+          "unit": "minor currency units"
+        },
+        "metric": "gross_sales",
+        "row_count": 2,
+        "rows": [
+          {
+            "currency": "COP",
+            "period": "2026-04",
+            "source_rows": 619,
+            "value": 214510000
+          },
+          {
+            "currency": "COP",
+            "period": "2026-05",
+            "source_rows": 593,
+            "value": 209255000
+          }
+        ],
+        "sql_executed": "SELECT strftime(event_at, '%Y-%m') AS period, currency,\n sum(gross_minor) AS value, count(*) AS source_rows\nFROM fct_order_lines WHERE status = 'completed' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2 ORDER BY 1, 2 LIMIT 500"
+      },
+      {
+        "bound_parameters": [
+          "2026-04-01",
+          "2026-06-01",
+          "USD"
+        ],
+        "currency": "USD",
+        "definition": {
+          "formula": "distinct cancelled eligible orders / distinct eligible placed orders \u00d7 100",
+          "grain": "UTC month and currency",
+          "label": "Cancellation rate",
+          "unit": "percent"
+        },
+        "metric": "cancellation_rate",
+        "row_count": 2,
+        "rows": [
+          {
+            "cancelled_orders": 123,
+            "currency": "USD",
+            "eligible_orders": 1364,
+            "period": "2026-04",
+            "value": 9.0176
+          },
+          {
+            "cancelled_orders": 119,
+            "currency": "USD",
+            "eligible_orders": 1303,
+            "period": "2026-05",
+            "value": 9.1328
+          }
+        ],
+        "sql_executed": "SELECT strftime(event_at, '%Y-%m') AS period, currency,\n count(DISTINCT order_id) AS eligible_orders,\n count(DISTINCT CASE WHEN status = 'cancelled' THEN order_id END) AS cancelled_orders,\n round(100.0 * count(DISTINCT CASE WHEN status = 'cancelled' THEN order_id END)\n       / nullif(count(DISTINCT order_id), 0), 4) AS value\nFROM fct_orders WHERE event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2 ORDER BY 1, 2 LIMIT 500"
+      },
+      {
+        "bound_parameters": [
+          "2026-04-01",
+          "2026-06-01",
+          "COP"
+        ],
+        "currency": "COP",
+        "definition": {
+          "formula": "distinct cancelled eligible orders / distinct eligible placed orders \u00d7 100",
+          "grain": "UTC month and currency",
+          "label": "Cancellation rate",
+          "unit": "percent"
+        },
+        "metric": "cancellation_rate",
+        "row_count": 2,
+        "rows": [
+          {
+            "cancelled_orders": 62,
+            "currency": "COP",
+            "eligible_orders": 681,
+            "period": "2026-04",
+            "value": 9.1043
+          },
+          {
+            "cancelled_orders": 59,
+            "currency": "COP",
+            "eligible_orders": 652,
+            "period": "2026-05",
+            "value": 9.0491
+          }
+        ],
+        "sql_executed": "SELECT strftime(event_at, '%Y-%m') AS period, currency,\n count(DISTINCT order_id) AS eligible_orders,\n count(DISTINCT CASE WHEN status = 'cancelled' THEN order_id END) AS cancelled_orders,\n round(100.0 * count(DISTINCT CASE WHEN status = 'cancelled' THEN order_id END)\n       / nullif(count(DISTINCT order_id), 0), 4) AS value\nFROM fct_orders WHERE event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2 ORDER BY 1, 2 LIMIT 500"
+      },
+      {
+        "bound_parameters": [
+          "2026-04-01",
+          "2026-06-01",
+          "USD",
+          "2026-04-01",
+          "2026-06-01",
+          "USD"
+        ],
+        "currency": "USD",
+        "definition": {
+          "formula": "completed category line value after discount, less accepted category returns in acceptance month",
+          "grain": "UTC month, currency, product category",
+          "label": "Net sales by category",
+          "unit": "minor currency units"
+        },
+        "metric": "net_sales_by_category",
+        "row_count": 6,
+        "rows": [
+          {
+            "category": "parts",
+            "currency": "USD",
+            "period": "2026-04",
+            "return_rows": 81,
+            "sales_rows": 1241,
+            "value": 2030844
+          },
+          {
+            "category": "supplies",
+            "currency": "USD",
+            "period": "2026-04",
+            "return_rows": 0,
+            "sales_rows": 620,
+            "value": 1386337
+          },
+          {
+            "category": "tools",
+            "currency": "USD",
+            "period": "2026-04",
+            "return_rows": 83,
+            "sales_rows": 1241,
+            "value": 2727843
+          },
+          {
+            "category": "parts",
+            "currency": "USD",
+            "period": "2026-05",
+            "return_rows": 87,
+            "sales_rows": 1184,
+            "value": 1963813
+          },
+          {
+            "category": "supplies",
+            "currency": "USD",
+            "period": "2026-05",
+            "return_rows": 0,
+            "sales_rows": 592,
+            "value": 1347066
+          },
+          {
+            "category": "tools",
+            "currency": "USD",
+            "period": "2026-05",
+            "return_rows": 86,
+            "sales_rows": 1184,
+            "value": 2643614
+          }
+        ],
+        "sql_executed": "WITH sales AS (SELECT strftime(event_at, '%Y-%m') AS period, currency, category,\n sum(sales_minor) AS amount, count(*) AS row_count\nFROM fct_order_lines WHERE status = 'completed' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2, 3), returns AS (SELECT strftime(event_at, '%Y-%m') AS period, currency, category,\n sum(amount_minor) AS amount, count(*) AS row_count\nFROM fct_returns WHERE status = 'accepted' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2, 3),\n keys AS (SELECT period, currency, category FROM sales UNION SELECT period, currency, category FROM returns)\nSELECT keys.period, keys.currency, keys.category,\n coalesce(sales.amount, 0) - coalesce(returns.amount, 0) AS value,\n coalesce(sales.row_count, 0) AS sales_rows, coalesce(returns.row_count, 0) AS return_rows\nFROM keys LEFT JOIN sales ON keys.period = sales.period AND keys.currency = sales.currency AND keys.category = sales.category\nLEFT JOIN returns ON keys.period = returns.period AND keys.currency = returns.currency AND keys.category = returns.category\nORDER BY 1, 2, 3 LIMIT 500"
+      },
+      {
+        "bound_parameters": [
+          "2026-04-01",
+          "2026-06-01",
+          "COP",
+          "2026-04-01",
+          "2026-06-01",
+          "COP"
+        ],
+        "currency": "COP",
+        "definition": {
+          "formula": "completed category line value after discount, less accepted category returns in acceptance month",
+          "grain": "UTC month, currency, product category",
+          "label": "Net sales by category",
+          "unit": "minor currency units"
+        },
+        "metric": "net_sales_by_category",
+        "row_count": 2,
+        "rows": [
+          {
+            "category": "supplies",
+            "currency": "COP",
+            "period": "2026-04",
+            "return_rows": 80,
+            "sales_rows": 619,
+            "value": 196597500
+          },
+          {
+            "category": "supplies",
+            "currency": "COP",
+            "period": "2026-05",
+            "return_rows": 90,
+            "sales_rows": 593,
+            "value": 189121000
+          }
+        ],
+        "sql_executed": "WITH sales AS (SELECT strftime(event_at, '%Y-%m') AS period, currency, category,\n sum(sales_minor) AS amount, count(*) AS row_count\nFROM fct_order_lines WHERE status = 'completed' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2, 3), returns AS (SELECT strftime(event_at, '%Y-%m') AS period, currency, category,\n sum(amount_minor) AS amount, count(*) AS row_count\nFROM fct_returns WHERE status = 'accepted' AND event_at >= ? AND event_at < ? AND currency = ?\nGROUP BY 1, 2, 3),\n keys AS (SELECT period, currency, category FROM sales UNION SELECT period, currency, category FROM returns)\nSELECT keys.period, keys.currency, keys.category,\n coalesce(sales.amount, 0) - coalesce(returns.amount, 0) AS value,\n coalesce(sales.row_count, 0) AS sales_rows, coalesce(returns.row_count, 0) AS return_rows\nFROM keys LEFT JOIN sales ON keys.period = sales.period AND keys.currency = sales.currency AND keys.category = sales.category\nLEFT JOIN returns ON keys.period = returns.period AND keys.currency = returns.currency AND keys.category = returns.category\nORDER BY 1, 2, 3 LIMIT 500"
+      }
+    ],
+    "rejected_count": 0,
+    "run_id": "8efb27e007e5dea3",
+    "semantic_version": "1.0.0",
+    "source_count": 12723,
+    "source_sha256": "38c7ff95e83758310c0b3ae0bc04378da37f94c19b08d00f91e75f45239f8e5f",
+    "window": "2026-04-01 inclusive to 2026-06-01 exclusive UTC"
+  },
+  "energy": {
+    "counts": {
+      "asset_hourly": 27,
+      "incidents": 1,
+      "measurements": 106,
+      "quarantine": 0,
+      "raw_events": 106
+    },
+    "emitted_events": 106,
+    "expected_events": 108,
+    "incidents": [
+      {
+        "asset_id": "PUMP-A102",
+        "closed_at_utc": "2026-10-15T01:45:00Z",
+        "first_event_id": "EVT-PUMP-A102-20261015T0115Z-TEMPERATURE",
+        "gap_count": 0,
+        "incident_id": "INC-807B2328FAB68FF0",
+        "last_event_id": "EVT-PUMP-A102-20261015T0130Z-TEMPERATURE",
+        "metric": "temperature",
+        "opened_at_utc": "2026-10-15T01:15:00Z",
+        "operator": ">",
+        "rule_version": "temp-high-v1",
+        "source_sha256": "a8f25432739603ed92b2cb0a86f74fb2baaf1c45bf9351e29d742e014786a350",
+        "status": "CLOSED",
+        "threshold": 80.0
+      }
+    ],
+    "quality": [
+      {
+        "asset_id": "CHILL-C301",
+        "expected_samples": 4,
+        "hour_utc": "2026-10-15T00:00:00Z",
+        "metric": "pressure",
+        "quality_status": "PARTIAL",
+        "received_samples": 3
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "expected_samples": 4,
+        "hour_utc": "2026-10-15T01:00:00Z",
+        "metric": "pressure",
+        "quality_status": "PARTIAL",
+        "received_samples": 3
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "expected_samples": 4,
+        "hour_utc": "2026-10-15T02:00:00Z",
+        "metric": "pressure",
+        "quality_status": "COMPLETE",
+        "received_samples": 4
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "expected_samples": 4,
+        "hour_utc": "2026-10-15T00:00:00Z",
+        "metric": "temperature",
+        "quality_status": "COMPLETE",
+        "received_samples": 4
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "expected_samples": 4,
+        "hour_utc": "2026-10-15T01:00:00Z",
+        "metric": "temperature",
+        "quality_status": "COMPLETE",
+        "received_samples": 4
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "expected_samples": 4,
+        "hour_utc": "2026-10-15T02:00:00Z",
+        "metric": "temperature",
+        "quality_status": "COMPLETE",
+        "received_samples": 4
+      }
+    ],
+    "readings": [
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0000Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T00:00:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 57.84
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0015Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T00:15:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 58.18
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0030Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T00:30:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 57.19
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0115Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T01:15:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 57.42
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0130Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T01:30:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 58.98
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0145Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T01:45:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 57.54
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0200Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T02:00:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 57.53
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0215Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T02:15:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 58.02
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0230Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T02:30:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 58.99
+      },
+      {
+        "asset_id": "CHILL-C301",
+        "event_id": "EVT-CHILL-C301-20261015T0245Z-PRESSURE",
+        "metric": "pressure",
+        "observed_at_utc": "2026-10-15T02:45:00Z",
+        "source_quality": "GOOD",
+        "unit": "bar",
+        "value": 58.28
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0000Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T00:00:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 64.28
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0015Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T00:15:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 63.06
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0030Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T00:30:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 64.62
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0045Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T00:45:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 63.19
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0100Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T01:00:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 64.1
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0115Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T01:15:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 84.3
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0130Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T01:30:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 83.1
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0145Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T01:45:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 64.28
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0200Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T02:00:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 63.42
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0215Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T02:15:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 63.49
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0230Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T02:30:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 63.18
+      },
+      {
+        "asset_id": "PUMP-A102",
+        "event_id": "EVT-PUMP-A102-20261015T0245Z-TEMPERATURE",
+        "metric": "temperature",
+        "observed_at_utc": "2026-10-15T02:45:00Z",
+        "source_quality": "GOOD",
+        "unit": "C",
+        "value": 64.06
+      }
+    ],
+    "rules": {
+      "pressure": {
+        "operator": "<",
+        "threshold": 45.0,
+        "unit": "bar",
+        "version": "pressure-low-v1"
+      },
+      "temperature": {
+        "operator": ">",
+        "threshold": 80.0,
+        "unit": "C",
+        "version": "temp-high-v1"
+      },
+      "vibration": {
+        "operator": ">",
+        "threshold": 5.5,
+        "unit": "mm/s",
+        "version": "vibration-high-v1"
+      }
+    },
+    "schema_version": 3,
+    "source_sha256": "cfbe54cc0b3de09672ae216363aef05c65534a7412a9acefdff534c6ce6d7c2f"
+  },
+  "exported_at_utc": "2026-10-15T14:33:31.869654+00:00",
+  "label": "SYNTHETIC, FROZEN EXPORT \u2014 local systems are executable separately",
+  "migration": {
+    "cases": [
+      {
+        "case_id": "01-keyed-projection",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "3562936196d03472b312f7cd1d60fe636d2ef905cb68b9c8996ef0c61439cabf",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "47687d00db10615ce4f7494e36e6749a4d3ca625eba2fb0c4ee5d3d5f23b30d5",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "2023b1f9759b432bf8a407aa2a1724b0b32772aaf5d234e7b74daad5c7d6c26b"
+        },
+        "result_hashes": {
+          "source": "6c14d3fceb54356adc6a9084b1d0db143f1c0ade810e4b964aa4fde7de42c393",
+          "target": "49e1237bc2cb6badb425ed74ee187f6ef2df396931b439d42cc19764b6146296"
+        },
+        "row_counts": {
+          "source": 5,
+          "target": 5
+        },
+        "source_sql": "SELECT order_id, amount FROM orders ORDER BY order_id",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT order_id, amount FROM orders ORDER BY order_id NULLS FIRST"
+      },
+      {
+        "case_id": "02-filter-status",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "a744633f14abcd6d9eb3e52efec1704f0fbd6e1ce92837fa15cfced5cc765e24",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "c99299e83a269e0b7c0e8ba715419790a11e2fa784235bcda494e8bcea138f30",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "5c4707305809c07037df97a7cbfe9821f103130b7e59a6f35404473717c8de68"
+        },
+        "result_hashes": {
+          "source": "08b2cacb89c4ab7090333d5c29c7e3cb1f279c2204c2fb47889a8610ae250d7b",
+          "target": "c7bede2db3cf25a135ffee2af03fcf2b4485416631414fa0341f0f851d67993c"
+        },
+        "row_counts": {
+          "source": 3,
+          "target": 3
+        },
+        "source_sql": "SELECT order_id, status FROM orders WHERE status = 'paid' ORDER BY order_id",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT order_id, status FROM orders WHERE status = 'paid' ORDER BY order_id NULLS FIRST"
+      },
+      {
+        "case_id": "03-filter-null",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "c7e70e50ee643cc9a3409ca2e18043e71e7645db50ec1ee26cb30deb79b2c3cd",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "0e4617d492c35b7d5822c6c4ada1edd1aedfcb9344c194ab592b1ff56f2aa58c",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "e78a7cb399c5a09026d6582bea37a3af61098d40514f72811e664c31a57c9d11"
+        },
+        "result_hashes": {
+          "source": "36bd649fd9b76a210f59e5ee913f061ceafea536fb3d783103cf5065a1b75888",
+          "target": "cb1e699f356f8e0dd930d4a8f6972cc3f8fd4b902cbf76370cd6ade1bf3c10b3"
+        },
+        "row_counts": {
+          "source": 1,
+          "target": 1
+        },
+        "source_sql": "SELECT order_id, amount FROM orders WHERE amount IS NULL ORDER BY order_id",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT order_id, amount FROM orders WHERE amount IS NULL ORDER BY order_id NULLS FIRST"
+      },
+      {
+        "case_id": "04-group-count",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "49165465e46985703224e4e7889ac49a1130dcb97c197a54b858cf54b2600395",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "e5b3963d74f8964a0d80d5bd6676734651285e965fc3479a4417bd328344c690",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "eb70868854005bf22d72fbf286149b031c81640aad32061f301eb15f77bb8aa9"
+        },
+        "result_hashes": {
+          "source": "d6e38fad116d7c722726367420018602de59058e530e33be5386b5bb7e6b7661",
+          "target": "0a178a48ea268bbd00a7ec8c2d8eee5fd6b42c1b25b676740f3471508750f148"
+        },
+        "row_counts": {
+          "source": 3,
+          "target": 3
+        },
+        "source_sql": "SELECT status, COUNT(*) AS orders_count FROM orders GROUP BY status ORDER BY status",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT status, COUNT(*) AS orders_count FROM orders GROUP BY status ORDER BY status NULLS FIRST"
+      },
+      {
+        "case_id": "05-group-sum",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "f4eac92e3a6b430d09f6735858f3139c48192b6317353a7097a40504d1b3915a",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "4aaa212ecfd7c5d258cacf4438a3f3c8de46c440da407a7a658dcbdc01caabd9",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "af8cbc459aaeff220d8ce24bc25fd2970976960a468c919d05d1265cb0998d21"
+        },
+        "result_hashes": {
+          "source": "50a0d63e7499a38ee5526e65e695fb217bf9b1efea2e828290b91a8034499069",
+          "target": "5f69b13d12854dddc58f533a03f775a0b63e038a8a154c4b2571e7528b33c868"
+        },
+        "row_counts": {
+          "source": 3,
+          "target": 3
+        },
+        "source_sql": "SELECT region, SUM(amount) AS total_amount FROM orders GROUP BY region ORDER BY region",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT region, SUM(amount) AS total_amount FROM orders GROUP BY region ORDER BY region NULLS FIRST"
+      },
+      {
+        "case_id": "06-coalesce",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "6e510247d104987bdd56600989f3f3fb4cc42ba4f4693c2cd542cc67b76f8ec4",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "ba5ff60f4a7336e2fd803b1847a10887a72d859ec17fed2284e84cf85766bec0",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "b46a5d419c0d258389a4af35a600d9b8a472fd598d29f5bbe4fe14b65d8efcb0"
+        },
+        "result_hashes": {
+          "source": "6a8dbc0fa8d651d8114824e5ea813b12ece973cea83f5028ba042ce30b848f21",
+          "target": "9e7b20d1ca3d0caed69df96cb9bc7e7794f586220d8fee96525f6ccbf7bdcb31"
+        },
+        "row_counts": {
+          "source": 5,
+          "target": 5
+        },
+        "source_sql": "SELECT order_id, COALESCE(amount, 0) AS safe_amount FROM orders ORDER BY order_id",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT order_id, COALESCE(amount, 0) AS safe_amount FROM orders ORDER BY order_id NULLS FIRST"
+      },
+      {
+        "case_id": "07-having",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "bece5162971243f974210cb3e4df6d5c15dca6748dd57f610b40b6657cd1a1d9",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "b62cde2f1c417d3758b847d840fb5eb3f98911dfb768588f8337ba92e796e84a",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "391e1ef89f76fef84b002b7152677f11da8d2c8e3b145ef745c86751de3d79ae"
+        },
+        "result_hashes": {
+          "source": "8ff8511c743e6fc97ba7f15a9f41ac0074bb19055e89b671527f21e43fd6d99c",
+          "target": "cc1b4e457a409a92562a2fda0d8405231c2e11e20219ad2064b7c7429d272050"
+        },
+        "row_counts": {
+          "source": 1,
+          "target": 1
+        },
+        "source_sql": "SELECT region, COUNT(*) AS orders_count FROM orders GROUP BY region HAVING COUNT(*) > 1 ORDER BY region",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT region, COUNT(*) AS orders_count FROM orders GROUP BY region HAVING COUNT(*) > 1 ORDER BY region NULLS FIRST"
+      },
+      {
+        "case_id": "08-range",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "2e6496cb4645fc5f74fe04bc49fec2c5b62490e86057d3bd1aa80945d132f575",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "6e7910b0e2b097fec0ecf7fc3627785e35acad5d4ccc9f0807f5a8def05e3702",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "7119602b5b18b21c2609afe3314f5de5926c432a25805e8d6ef2cecff358d892"
+        },
+        "result_hashes": {
+          "source": "e78fc4a11d53cf48061546079865ac7ea2f8d095e1265cd7ec8718fe74dd070f",
+          "target": "3935fa91ad3e4ff6541f7e16e359ce334a2ce6971a30bcaf1872f9a21e564a39"
+        },
+        "row_counts": {
+          "source": 3,
+          "target": 3
+        },
+        "source_sql": "SELECT order_id, ordered_on FROM orders WHERE ordered_on >= '2026-01-02' AND ordered_on <= '2026-01-04' ORDER BY order_id",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT order_id, ordered_on FROM orders WHERE ordered_on >= '2026-01-02' AND ordered_on <= '2026-01-04' ORDER BY order_id NULLS FIRST"
+      },
+      {
+        "case_id": "09-arithmetic",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "2fb141358018ed8dbe8dc63d82bf384473dfd7d2485c62aff076f37ec6843984",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "2f91cab6837a06a4f1f3295376aed7ebfd2994d92c4721b10e98518adecb7882",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "bc260acc55e245d3a7226b351074f8af23d21aa2a085df9c8518fe6fe69981bd"
+        },
+        "result_hashes": {
+          "source": "b8c2d4a812e08abc6594702bd73c07e6d5f196e530f5e28b53539c8edf03d1bc",
+          "target": "7fbd6b18425c62753d0b83272ddc13611f3055743437087c1f609e935adce748"
+        },
+        "row_counts": {
+          "source": 5,
+          "target": 5
+        },
+        "source_sql": "SELECT order_id, quantity * 2 AS doubled_quantity FROM orders ORDER BY order_id",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT order_id, quantity * 2 AS doubled_quantity FROM orders ORDER BY order_id NULLS FIRST"
+      },
+      {
+        "case_id": "10-ordered-limit",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "e3f5339bf68fbf7a879154ef8f10b37d294028f71b1341014a2b0d8d40b5c28b",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "7a02c1678e28d60d5880c35fef722ca3b8be263a3e5875f65536c15250428f3b",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "1419801faac2fc258f2d552d86b038c961d207f2607e2c738203f5f03d42a139"
+        },
+        "result_hashes": {
+          "source": "5f492c005d623d16102eda4673c5f95c3908f9196fc34aca5eb01f89efbb28c6",
+          "target": "1f9084e11331d247e7af89d58d994165db7f02c4fd865ba2aaa694135f4ea4da"
+        },
+        "row_counts": {
+          "source": 3,
+          "target": 3
+        },
+        "source_sql": "SELECT order_id, status FROM orders ORDER BY order_id LIMIT 3",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT order_id, status FROM orders ORDER BY order_id NULLS FIRST LIMIT 3"
+      },
+      {
+        "case_id": "11-duplicate-aware-multiset",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "f730f54316a989eb00e1de713e353ea76d85b0ed5a9dbf7017a94d68f35d80db",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "9ad5fbdc018ea2f41a409a6cf171ecb5ae753ed1394b741fa3be09ef0be04804",
+          "target_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "target_sql": "9ad5fbdc018ea2f41a409a6cf171ecb5ae753ed1394b741fa3be09ef0be04804"
+        },
+        "result_hashes": {
+          "source": "f111058608eccdc8422ecd35a14f5995a523387bf8d415983579d1d854942e86",
+          "target": "6ff9d7304afbfa129583cd378d2a31d2abc4ef3a970d12ef223fedc7b0eb027d"
+        },
+        "row_counts": {
+          "source": 5,
+          "target": 5
+        },
+        "source_sql": "SELECT status FROM orders",
+        "stage": "comparison",
+        "status": "PASS",
+        "target_sql": "SELECT status FROM orders"
+      },
+      {
+        "case_id": "12-intentional-mismatch",
+        "differences": [
+          {
+            "actual": "11.00",
+            "column": "amount",
+            "detail": "A-001.amount: expected 10.00; actual 11.00",
+            "expected": "10.00",
+            "key": "A-001",
+            "kind": "value"
+          },
+          {
+            "detail": "Output sequence differs",
+            "kind": "order"
+          }
+        ],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "9a43f5e1d43dba3143418c2e2807773c7295365b53717033d1d1ce8a14590800",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "47687d00db10615ce4f7494e36e6749a4d3ca625eba2fb0c4ee5d3d5f23b30d5",
+          "target_fixture": "3b35095d87408faade859d73cb7550fcdaea438231c2b20202d3f53ce76a3f46",
+          "target_sql": "2023b1f9759b432bf8a407aa2a1724b0b32772aaf5d234e7b74daad5c7d6c26b"
+        },
+        "result_hashes": {
+          "source": "6c14d3fceb54356adc6a9084b1d0db143f1c0ade810e4b964aa4fde7de42c393",
+          "target": "5178091c051fa563396198bb580fc98cebf0b8d4fed9dee5ee43ec93e72ee41c"
+        },
+        "row_counts": {
+          "source": 5,
+          "target": 5
+        },
+        "source_sql": "SELECT order_id, amount FROM orders ORDER BY order_id",
+        "stage": "comparison",
+        "status": "FAIL",
+        "target_sql": "SELECT order_id, amount FROM orders ORDER BY order_id NULLS FIRST"
+      },
+      {
+        "case_id": "13-missing-key",
+        "differences": [
+          {
+            "kind": "row_count",
+            "source": 5,
+            "target": 4
+          },
+          {
+            "key": "A-004",
+            "kind": "missing_key",
+            "source_present": true,
+            "target_present": false
+          },
+          {
+            "detail": "Output sequence differs",
+            "kind": "order"
+          }
+        ],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": null,
+        "input_hashes": {
+          "case": "aeaa9f0d7786c18a71161ae7b63fb7fcb6dbf1eefa8e8eda3dcbea6716b8da1f",
+          "source_fixture": "07904948a90f54c4d16746ceb7def530ff9cbeb0e15dc3b19c04a6ea9f598cb7",
+          "source_sql": "47687d00db10615ce4f7494e36e6749a4d3ca625eba2fb0c4ee5d3d5f23b30d5",
+          "target_fixture": "596804b6f213e6adf026b2ea666bfa20f63bf616711aa75e7eb83c37067fe1b4",
+          "target_sql": "2023b1f9759b432bf8a407aa2a1724b0b32772aaf5d234e7b74daad5c7d6c26b"
+        },
+        "result_hashes": {
+          "source": "6c14d3fceb54356adc6a9084b1d0db143f1c0ade810e4b964aa4fde7de42c393",
+          "target": "2236dee7ce1801bf01f47379eabc3988b51683d861c0326bd96962adc82665bb"
+        },
+        "row_counts": {
+          "source": 5,
+          "target": 4
+        },
+        "source_sql": "SELECT order_id, amount FROM orders ORDER BY order_id",
+        "stage": "comparison",
+        "status": "FAIL",
+        "target_sql": "SELECT order_id, amount FROM orders ORDER BY order_id NULLS FIRST"
+      },
+      {
+        "case_id": "14-review-mutation",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": "ValueError: Exactly one top-level SELECT is supported; DDL/DML and multiple statements require review",
+        "input_hashes": null,
+        "result_hashes": null,
+        "row_counts": null,
+        "source_sql": null,
+        "stage": "validation",
+        "status": "REVIEW",
+        "target_sql": null
+      },
+      {
+        "case_id": "15-review-unordered-limit",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": "ValueError: LIMIT without ORDER BY is nondeterministic and requires review",
+        "input_hashes": null,
+        "result_hashes": null,
+        "row_counts": null,
+        "source_sql": null,
+        "stage": "validation",
+        "status": "REVIEW",
+        "target_sql": null
+      },
+      {
+        "case_id": "16-review-unapproved-table",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": "ValueError: Only the declared orders table is supported; referenced: ['users']",
+        "input_hashes": null,
+        "result_hashes": null,
+        "row_counts": null,
+        "source_sql": null,
+        "stage": "validation",
+        "status": "REVIEW",
+        "target_sql": null
+      },
+      {
+        "case_id": "17-review-unsafe-function",
+        "differences": [],
+        "engines": {
+          "source": "SQLite 3.53.1",
+          "target": "DuckDB 1.5.6"
+        },
+        "error": "ValueError: Unsupported SQL construct Anonymous at LOAD_EXTENSION('x')",
+        "input_hashes": null,
+        "result_hashes": null,
+        "row_counts": null,
+        "source_sql": null,
+        "stage": "validation",
+        "status": "REVIEW",
+        "target_sql": null
+      }
+    ],
+    "counts": {
+      "FAIL": 2,
+      "PASS": 11,
+      "REVIEW": 4
+    },
+    "rules_version": "sqlite-duckdb-subset-1"
+  },
+  "source_commit": "aac668016c25f9dfe46e01de18dd50f0162c4e7b"
+}
