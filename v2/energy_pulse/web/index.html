@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EnergyPulse V2 · Synthetic telemetry evidence</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <a class="skip" href="#workspace">Skip to data</a>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark">EP</span><span>EnergyPulse <small>V2 reference system</small></span></div>
+    <div class="top-actions"><span class="synthetic">SYNTHETIC DATA · LOCAL API</span><button id="language" type="button" aria-label="Switch language">ES</button></div>
+  </header>
+  <main id="workspace">
+    <section class="hero">
+      <div><p class="eyebrow" data-i="eyebrow">INDUSTRIAL TELEMETRY / DATA QUALITY</p><h1 data-i="title">Every incident has a source.</h1><p class="intro" data-i="intro">Explore persisted sensor readings, expected slots and the rule that produced an incident. This is a synthetic reference system, not live plant monitoring.</p></div>
+      <div class="run-card"><span data-i="latestRun">Latest pipeline run</span><strong id="run-id">Loading…</strong><small id="run-meta">—</small></div>
+    </section>
+    <section class="panel controls" aria-label="Data filters">
+      <label><span data-i="asset">Asset</span><select id="asset"></select></label>
+      <label><span data-i="signal">Signal</span><select id="metric"><option value="temperature">Temperature · °C</option><option value="vibration">Vibration · mm/s</option><option value="pressure">Pressure · bar</option></select></label>
+      <button id="refresh" type="button" data-i="refresh">Refresh from API</button>
+      <p id="status" role="status" aria-live="polite">Loading persisted data…</p>
+    </section>
+    <section class="kpis" aria-label="Pipeline summary">
+      <article><span data-i="received">Valid readings</span><strong id="received">—</strong><small data-i="receivedNote">For the selected asset and signal</small></article>
+      <article><span data-i="coverage">Expected-slot coverage</span><strong id="coverage">—</strong><small data-i="coverageNote">Received GOOD / expected</small></article>
+      <article><span data-i="alerts">Incidents</span><strong id="alerts">—</strong><small data-i="alertsNote">Versioned threshold episodes</small></article>
+    </section>
+    <div class="grid">
+      <section class="panel chart-panel">
+        <div class="section-head"><div><p class="eyebrow" data-i="trendLabel">PERSISTED SILVER</p><h2 data-i="trend">Time series</h2></div><span id="chart-unit">—</span></div>
+        <p class="hint" data-i="chartHint">UTC · 15-minute observations. Select an incident for raw → clean → Gold lineage.</p>
+        <div id="chart" role="img" aria-label="Time-series chart loading"></div>
+        <div class="table-wrap"><table><caption data-i="readingsCaption">Source-backed readings</caption><thead><tr><th scope="col" data-i="time">Time UTC</th><th scope="col" data-i="value">Value</th><th scope="col" data-i="quality">Quality</th><th scope="col">Event ID</th></tr></thead><tbody id="readings"></tbody></table></div>
+      </section>
+      <div class="side">
+        <section class="panel"><div class="section-head"><div><p class="eyebrow" data-i="expectedLabel">EXPECTED VS RECEIVED</p><h2 data-i="qualityTitle">Quality by hour</h2></div></div><div id="heatmap" class="heatmap" aria-label="Hourly data quality"></div><p class="hint" data-i="qualityHint">A missing slot is missing, never a zero measurement.</p></section>
+        <section class="panel"><div class="section-head"><div><p class="eyebrow" data-i="ruleLabel">VERSIONED RULES</p><h2 data-i="incidentTitle">Incidents</h2></div></div><div id="incidents" class="incidents"></div></section>
+      </div>
+    </div>
+    <section class="panel lineage-panel"><div class="section-head"><div><p class="eyebrow" data-i="traceLabel">SOURCE → DECISION</p><h2 data-i="traceTitle">Incident lineage</h2></div></div><p id="lineage-intro" data-i="traceHint">Select an incident to inspect the original event, normalized row, Gold hour and applied rule.</p><div id="lineage"></div></section>
+    <footer><span data-i="footer">Synthetic demonstration · local read-only API · no client or live equipment data</span></footer>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

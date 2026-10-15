@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mariacm34.github.io/contracts/energy-event-v1.schema.json",
+  "title": "EnergyPulse synthetic telemetry event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "source_id", "asset_id", "site_id", "observed_at_utc", "metric", "value", "unit", "quality", "schema_version"],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "source_id": {"type": "string", "pattern": "^[A-Z0-9-]{3,40}$"},
+    "asset_id": {"type": "string", "pattern": "^[A-Z0-9-]{3,40}$"},
+    "site_id": {"type": "string", "pattern": "^[A-Z0-9-]{3,50}$"},
+    "observed_at_utc": {"type": "string", "format": "date-time"},
+    "metric": {"enum": ["temperature", "vibration", "pressure"]},
+    "value": {"type": "number"},
+    "unit": {"enum": ["C", "mm/s", "bar"]},
+    "quality": {"enum": ["GOOD", "SUSPECT", "BAD"]},
+    "schema_version": {"const": 1}
+  },
+  "allOf": [
+    {"if": {"properties": {"metric": {"const": "temperature"}}}, "then": {"properties": {"unit": {"const": "C"}}}},
+    {"if": {"properties": {"metric": {"const": "vibration"}}}, "then": {"properties": {"unit": {"const": "mm/s"}}}},
+    {"if": {"properties": {"metric": {"const": "pressure"}}}, "then": {"properties": {"unit": {"const": "bar"}}}}
+  ],
+  "description": "Synthetic-only public contract. Implementations must also reject non-finite numbers and require UTC Z timestamps."
+}

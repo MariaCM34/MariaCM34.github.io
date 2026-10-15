@@ -1,0 +1,5 @@
+# EnergyPulse reference security boundary
+
+The default trust boundary is a single developer machine. The producer accepts only a seed and bounded slot count. Ingest validates JSON shape, finite values, UTC time, asset registry, metric/unit pair and natural key before Silver. Rejected raw lines are stored in quarantine and must be treated as untrusted if displayed later. SQLite statements use bound parameters for data values; the only dynamic SQL fields in the run writer are from an internal fixed allowlist. The API opens the database in read-only/query-only mode and has bounded pagination. The server binds to localhost; it has no authentication and must not be exposed to the Internet.
+
+Threats still open for a hosted variant: request abuse, long-running queries, rate limiting, tenant isolation, authenticated incident acknowledgment, TLS, backup/retention, quarantine redaction and audit tamper resistance. No credentials, production telemetry, industrial control interface or remote API call are required. Static Pages artifacts must be sanitized and limited to synthetic records.
