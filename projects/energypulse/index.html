@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101f2c">
+  <meta name="description" content="EnergyPulse: an interactive, synthetic industrial telemetry demonstration with explainable rules.">
+  <title>EnergyPulse · Telemetry operations demo</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#main" data-i18n="skip">Saltar al contenido</a>
+  <header class="site-header">
+    <a class="brand" href="../../index.html" aria-label="Portfolio home"><span class="brand-mark" aria-hidden="true">⌁</span><span>MariaCM34 <small>/ LAB</small></span></a>
+    <nav aria-label="Project navigation"><a href="../../index.html" data-i18n="portfolio">Portafolio</a><a href="./README.md" data-i18n="method">Método y código</a><button id="language" type="button" aria-label="Switch language to English">EN</button></nav>
+  </header>
+  <main id="main">
+    <section class="intro wrap">
+      <div class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="eyebrow">DEMO DE INGENIERÍA DE DATOS · 01 / 03</span></div>
+      <div class="intro-grid"><div><h1>Energy<span>Pulse</span><span class="pulse-dot" aria-hidden="true"></span></h1><p class="lede" data-i18n="lede">De una lectura de sensor a una decisión que se puede explicar.</p></div><p class="intro-copy" data-i18n="intro">Una planta industrial ficticia necesita detectar condiciones fuera de rango sin perder la trazabilidad de cada alerta. Explore tres activos, reproduzca lecturas y abra cualquier incidente para ver el valor y el umbral exactos.</p></div>
+      <div class="disclosure"><span class="signal-dot" aria-hidden="true"></span><strong data-i18n="synthetic">DATOS SINTÉTICOS</strong><span data-i18n="disclosure">216 lecturas deterministas, 3 activos ficticios, 14–16 sep 2026 UTC. No representa sistemas de clientes ni datos en vivo.</span></div>
+    </section>
+    <section class="workspace wrap" aria-labelledby="workspace-title">
+      <div class="section-heading"><div><span class="section-index">01 / OPERATIONS</span><h2 id="workspace-title" data-i18n="workspace">Centro de operaciones</h2></div><p id="window-summary" class="section-context"></p></div>
+      <div class="controls" aria-label="Dashboard filters">
+        <label><span data-i18n="asset">Activo</span><select id="asset"></select></label>
+        <label><span data-i18n="window">Ventana</span><select id="day"></select></label>
+        <label><span data-i18n="signal">Señal del gráfico</span><select id="metric"></select></label>
+        <div class="control-actions"><button id="replay" class="button-primary" type="button"><span aria-hidden="true">▶</span> <span data-i18n="replay">Reproducir período</span></button><button id="download" class="button-outline" type="button" data-i18n="download">Descargar CSV</button></div>
+      </div>
+      <div id="validation" role="alert" hidden></div>
+      <div class="metrics" id="metrics" aria-label="Window metrics"></div>
+      <div class="body-grid">
+        <section class="panel chart-panel" aria-labelledby="chart-title"><div class="panel-head"><div><span class="overline" data-i18n="trend">TENDENCIA / UMBRAL</span><h3 id="chart-title" data-i18n="chart">Lecturas por hora</h3></div><span id="chart-unit" class="unit-pill"></span></div><div id="chart" class="chart" role="img"></div><div class="chart-legend"><span><i class="legend-line"></i><span data-i18n="reading">Lectura</span></span><span><i class="legend-threshold"></i><span data-i18n="threshold">Umbral</span></span><span><i class="legend-point"></i><span data-i18n="anomaly">Anomalía</span></span></div><p id="replay-status" class="replay-status" aria-live="polite"></p></section>
+        <section class="panel incidents-panel" aria-labelledby="incidents-title"><div class="panel-head"><div><span class="overline" data-i18n="rule_engine">REGLAS EXPLÍCITAS</span><h3 id="incidents-title" data-i18n="incidents">Incidentes</h3></div><span id="incident-count" class="count-pill"></span></div><p class="panel-description" data-i18n="incident_intro">Seleccione un incidente para ver la medición y la regla que lo activó.</p><div id="incidents" class="incident-list"></div></section>
+      </div>
+      <section class="panel detail-panel" aria-labelledby="detail-title"><div class="panel-head"><div><span class="overline" data-i18n="explainability">EXPLICABILIDAD</span><h3 id="detail-title" data-i18n="inspection">Inspección de incidente</h3></div></div><div id="detail" aria-live="polite"></div></section>
+      <section class="panel table-panel" aria-labelledby="table-title"><div class="panel-head"><div><span class="overline" data-i18n="source_readings">LECTURAS DE ORIGEN</span><h3 id="table-title" data-i18n="raw">Mediciones sin agregar</h3></div><span id="row-count" class="count-pill"></span></div><p class="panel-description" data-i18n="table_intro">Cada fila proviene del generador reproducible incluido en este proyecto. Horas en UTC.</p><div class="table-scroll"><table><thead><tr><th scope="col" data-i18n="timestamp">Fecha / hora UTC</th><th scope="col" data-i18n="temperature">Temperatura · °C</th><th scope="col" data-i18n="vibration">Vibración · mm/s</th><th scope="col" data-i18n="pressure">Presión · bar</th><th scope="col" data-i18n="status">Estado</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+    </section>
+    <section class="method-strip"><div class="wrap method-grid"><div><span class="section-index">02 / ARCHITECTURE</span><h2 data-i18n="design">Diseño que se puede auditar.</h2></div><div class="method-cards"><article><b>01</b><h3 data-i18n="m_fixture">Datos reproducibles</h3><p data-i18n="m_fixture_body">Fixture determinista, tres días y un muestreo por hora. Valores e incidentes inyectados en código público.</p></article><article><b>02</b><h3 data-i18n="m_rules">Reglas separadas</h3><p data-i18n="m_rules_body">Límites por activo; cada alerta conserva valor, umbral, operador y hora. No hay IA detrás de las alertas.</p></article><article><b>03</b><h3 data-i18n="m_view">Vista estática</h3><p data-i18n="m_view_body">SVG, filtros, replay y CSV ejecutados en el navegador. Sin backend ni solicitudes de datos externas.</p></article></div></div></section>
+  </main>
+  <footer class="wrap"><p data-i18n="footer">EnergyPulse es una demostración pública con datos sintéticos. No es un sistema de monitoreo de producción.</p><a href="./README.md" data-i18n="readme">Leer arquitectura y pruebas ↗</a></footer>
+</body>
+</html>
